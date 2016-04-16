@@ -112,45 +112,48 @@ BOOL Application::openFile_LoadMusic(HWND hWnd)
 */
 BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
+	/*
+		Check the opening of the application copies
+	*/
 	CheckOpeningCopy(hwnd);
 	/*
-		Заголовок диалогового окна 
+		Tittle dialog
 	*/
 	SetWindowText(hwnd, NAMEPLEER);
 	/*
-		Цвет визуализации
+		Color visualization
 	*/
 	SetSpectrColor(hwnd);
 	/*
-		Загрузка иконки
+		Load icon
 	*/	
 	hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON1));
 	SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon);		
 	/*
-		Регулятор громкости
+		Slider volume
 	*/
 	hTBSoundVolume = GetDlgItem(hwnd, IDC_TRACKBARSOUND); 
 	SendMessage(hTBSoundVolume, TBM_SETPOS, TRUE, (LPARAM)100);
 	/*
-		Регулятор проигрывания
+		Slider playing songs
 	*/
 	hTBPlayingSong = GetDlgItem(hwnd, IDC_SLIDER_TIMEPLAYING);
 	/*
-		Создание PlayList
+		Create wnd playList
 	*/
 	dlg.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGPLAYLIST), hwnd, dlg.DlgProc);
 	/*
-		Создание Equalizer
+		Create Equalizer
 	*/
 	equalizer.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGEQUALIZER), hwnd, equalizer.DlgProc);
 	/*
-		Позиции визуализации на 0
+		Set the position of the spectrum to null
 	*/
 	SetNullPosSpectr();
 	return TRUE;
 }
 /*
-	Обработка WM_HSCROLL
+	Processing WM_HSCROLL
 */
 VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 {
@@ -171,7 +174,7 @@ VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 	}
 }
 /*
-	Обработка WM_COMMAND
+	Processing WM_COMMAND
 */
 VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify)
 {
@@ -305,7 +308,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 	}
 }
 /*
-	Обработка WM_TIMER
+	Processing WM_TIMER
 */
 VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 {
@@ -337,7 +340,7 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 	}
 }
 /*
-	Обработка WM_SYSCOMMAND
+	Processing WM_SYSCOMMAND
 */
 VOID Application::Cls_OnSysCommand(HWND hwnd, UINT cmd, INT x, INT y)
 {
@@ -381,7 +384,7 @@ VOID Application::AddIconInTray(HWND hWnd)
 	ShowWindow(hWnd, SW_HIDE);
 }
 /*
-	Функция загрузки фона
+	Fnct loading bckg
 */
 HBRUSH OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
@@ -389,7 +392,7 @@ HBRUSH OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 	return brush;
 }
 /*
-	Диалоговая процедура для диалогового окна
+	Dlg procedure by window
 */
 INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -555,7 +558,7 @@ VOID Application::next()
 	}
 }
 /*
-	Установка диапазона TrackBar (время проигрывания) текущей играющей песни
+	Set range of the TrackBar (Time playing)
 */
 VOID Application::setRangeTrackBarPlaySong(HSTREAM stream)
 {
@@ -564,7 +567,7 @@ VOID Application::setRangeTrackBarPlaySong(HSTREAM stream)
 	SendMessage(hTBPlayingSong, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(0, seconds + 1));
 }
 /*
-	Спектр
+	Spectrum
 */
 VOID Application::ControlSpectr(HWND hWnd)
 {
@@ -600,7 +603,7 @@ VOID Application::SetSpectrColor(HWND hWnd)
 	}
 }
 /*
-	Установка визуализации на 0 (При нажатии на Паузу/Стоп)
+	Set the position of the spectrum to null (Clicked Pause/Stop)
 */
 VOID Application::SetNullPosSpectr()
 {
