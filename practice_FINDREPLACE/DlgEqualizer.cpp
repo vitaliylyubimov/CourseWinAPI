@@ -30,7 +30,7 @@ VOID DlgEqualizer::ShowEqualizer(INT isShow)
 }
 
 /*
-Обработка WM_VSCROLL
+	Обработка WM_VSCROLL
 */
 VOID DlgEqualizer::Cls_OnVScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 {
@@ -67,9 +67,21 @@ VOID DlgEqualizer::SetFX(HSTREAM stream)
 
 BOOL DlgEqualizer::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
+	/*
+		
+	*/
 	hSlider_Hz_80to16000 = GetDlgItem(hwnd, IDC_SLIDER_Hz_80_16000);
+	SendDlgItemMessage(hwnd, IDC_SLIDER_Hz_80_16000, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(80, 16000));
+	/*
+	
+	*/
 	hSlider_Negative15toPositive15 = GetDlgItem(hwnd, IDC_SLIDER_Negative15_to_Positive15);
+	SendDlgItemMessage(hwnd, IDC_SLIDER_Negative15_to_Positive15, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(-15, 15));
+	/*
+	
+	*/
 	hSlider_BandWidth1to36 = GetDlgItem(hwnd, IDC_SLIDER_BANDWIDTH1_36);
+	SendDlgItemMessage(hwnd, IDC_SLIDER_BANDWIDTH1_36, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(1, 36));
 	return TRUE;
 }
 

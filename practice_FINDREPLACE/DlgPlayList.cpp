@@ -80,6 +80,7 @@ VOID DlgPlayList::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 				Application::_this->hStream = songs[idx].hStream;
 				Application::_this->secPlaying = 0;
 				Application::_this->setRangeTrackBarPlaySong(Application::_this->hStream);
+				DlgEqualizer::_this->SetFX(Application::_this->hStream);
 				BASS_Stop();
 				BASS_ChannelStop(Application::_this->hStream);
 				BASS_Start();

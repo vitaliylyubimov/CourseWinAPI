@@ -114,7 +114,7 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
 	CheckOpeningCopy(hwnd);
 	/*
-		Заголовок диалогового окна
+		Заголовок диалогового окна 
 	*/
 	SetWindowText(hwnd, NAMEPLEER);
 	/*
@@ -459,7 +459,6 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		default:
 			return FALSE;
 	}
-	
 	return FALSE;
 }
 /*
@@ -515,6 +514,7 @@ VOID Application::prev()
 		hStream = dlg.songs[prev].hStream;		//загрузка следующей песни в поток
 		secPlaying = 0;
 		setRangeTrackBarPlaySong(hStream);
+		equalizer.SetFX(hStream);
 		play(hStream);				//воспроизвести поток
 	}
 }
@@ -543,7 +543,8 @@ VOID Application::next()
 		stop(hStream);				//остановка потока
 		hStream = dlg.songs[next].hStream;		//загрузка следующей песни в поток
 		secPlaying = 0;
-		setRangeTrackBarPlaySong(hStream);
+		setRangeTrackBarPlaySong(hStream);		
+		equalizer.SetFX(hStream);
 		play(hStream);				//воспроизвести поток
 	}
 }
