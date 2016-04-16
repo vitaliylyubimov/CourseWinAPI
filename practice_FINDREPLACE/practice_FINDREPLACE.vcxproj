@@ -99,8 +99,6 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\..\..\bitmap2.bmp" />
-    <Image Include="..\..\..\bckg.bmp" />
     <Image Include="BMP\bckg.bmp" />
     <Image Include="ICON\AudioPleer.ico" />
   </ItemGroup>

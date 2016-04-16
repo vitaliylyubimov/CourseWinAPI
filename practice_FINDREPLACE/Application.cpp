@@ -416,6 +416,12 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 				SetTextColor(hDc, RGB(255, 255, 255));
 				return (LRESULT)GetStockObject(NULL_BRUSH);
 			}
+			else if (HWND(lParam) == GetDlgItem(hWnd, IDC_TRACKBARSOUND))
+			{
+				/*SetBkMode(hDc, TRANSPARENT);
+				SetTextColor(hDc, RGB(255, 255, 255));
+				return (LRESULT)GetStockObject(NULL_BRUSH);*/
+			}
 			break;
 		}
 		case WM_USER + 200:
