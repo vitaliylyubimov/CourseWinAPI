@@ -572,7 +572,7 @@ VOID Application::ControlSpectr(HWND hWnd)
 	}
 }
 /*
-	Установка цвета и диапазона визуализации
+	Setting color and range spectr
 */
 VOID Application::SetSpectrColor(HWND hWnd)
 {
