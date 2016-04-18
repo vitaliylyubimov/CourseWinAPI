@@ -2,6 +2,7 @@
 #include "include.h"
 #include "DlgPlayList.h"
 #include "DlgEqualizer.h"
+
 class Application
 {
 private:

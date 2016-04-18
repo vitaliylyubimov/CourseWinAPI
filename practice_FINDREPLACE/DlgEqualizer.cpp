@@ -123,7 +123,7 @@ VOID DlgEqualizer::SetFX(HSTREAM stream)
 	*/
 	for (int i = 0; i < 10;i++)
 	{
-		SendMessage(hSlidersEqualizer[i], TBM_SETPOS, TRUE, (LPARAM)15);
+		SendMessage(hSlidersEqualizer[i], TBM_SETPOS, TRUE, (LPARAM)15);		
 	}
 	/*
 		Set FX by device
@@ -174,7 +174,7 @@ HBRUSH OnColorStatic(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, RGB(0, 245, 255));
-	return (HBRUSH)GetStockObject(NULL_BRUSH);
+	return (HBRUSH)GetStockObject(BLACK_BRUSH);
 }
 /*
 	Dlg procedure

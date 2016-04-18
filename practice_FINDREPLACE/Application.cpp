@@ -153,6 +153,14 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		Set the position of the spectrum to null
 	*/
 	SetNullPosSpectr();
+	/*
+	// Set WS_EX_LAYERED on this window 
+	SetWindowLong(hwnd,
+		GWL_EXSTYLE,
+		GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+
+	// Make this window 70% alpha
+	SetLayeredWindowAttributes(hwnd, 0, (255 * 100) / 100, LWA_ALPHA);*/
 	return TRUE;
 }
 /*
@@ -205,7 +213,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 		{
 			if (hStream == NULL && dlg.songs.size() == 0)
 			{
-				BOOL isOpen = openFile_LoadMusic(hwnd);
+				BOOL isOpen = openFile_LoadMusic(hwnd);	
 				if (isOpen == TRUE)
 				{
 					play(hStream);
@@ -427,6 +435,9 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		case WM_CTLCOLORSTATIC:
 		{
 			HDC hDc = (HDC)wParam;
+			/*SetBkMode(hDc, TRANSPARENT);
+			SetTextColor(hDc, RGB(255, 255, 255));
+			return (LRESULT)GetStockObject(BLACK_BRUSH);*/
 			if (HWND(lParam) == GetDlgItem(hWnd, IDC_CHECKPLAYLIST))
 			{
 				SetBkMode(hDc, TRANSPARENT);
@@ -441,15 +452,18 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			}
 			else if (HWND(lParam) == _this->hTBSoundVolume)
 			{
-				//SetBkMode(hDc, TRANSPARENT);
-				//SetTextColor(hDc, RGB(255, 255, 255));
-				//return (LRESULT)GetStockObject(NULL_BRUSH);
+				SetBkMode(hDc, TRANSPARENT);
+				return (LRESULT)GetStockObject(BLACK_BRUSH);
 			}
 			else if (HWND(lParam) == _this->hSlider_Balance)
 			{
-				//SetBkMode(hDc, TRANSPARENT);
-				//SetTextColor(hDc, RGB(255, 255, 255));
-				//return (LRESULT)GetStockObject(NULL_BRUSH);
+				SetBkMode(hDc, TRANSPARENT);
+				return (LRESULT)GetStockObject(BLACK_BRUSH);
+			}
+			else if (HWND(lParam) == _this->hTBPlayingSong)
+			{
+				SetBkMode(hDc, TRANSPARENT);
+				return (LRESULT)GetStockObject(BLACK_BRUSH);
 			}
 			break;
 		}
