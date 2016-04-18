@@ -13,8 +13,8 @@ Application::Application(VOID)
 	_this = this;
 	CheckedInitBASS();					//проверка инициализации BASS
 	secPlaying = 0;						//время играющей песни
-	id_timer = 0;						//Определитель таймера
-	idTimerBySpectr = 1;
+	id_timer = 0;						//ID timer by PlayingSongs
+	idTimerBySpectr = 1;				//ID timer by Spectrum
 	IsRepeatSong = FALSE;				//повтор песни
 }
 /*
@@ -499,6 +499,57 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			}
 			break;
 		}
+		case WM_PAINT:
+		{
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(hWnd, &ps);
+			static RECT rect;
+			GetClientRect(hWnd, &rect);
+			static INT height = rect.bottom / 2 - 10;
+			/*
+				Black brush
+			*/
+			HBRUSH black_brush = CreateSolidBrush(RGB(0, 0, 0));	
+			SelectObject(hdc, black_brush);
+			Rectangle(hdc, rect.left + 15, rect.top, rect.right - 15, height);
+			/*
+				Yellow pen
+			*/
+			HPEN yellow_pen = CreatePen(PS_DOT, 3, RGB(255, 245, 0));
+			/*
+				Red pen
+			*/
+			HPEN red_pen = CreatePen(PS_DOT, 1.5, RGB(255, 0, 0));
+
+			
+			for (int i = 0; i < 128;i++)
+			{
+				SelectPen(hdc, red_pen);
+				MoveToEx(hdc, i + rect.left + 15 + 3, 15, NULL);
+				LineTo(hdc, i + rect.left + 15, 15);
+				SelectPen(hdc, yellow_pen);
+				MoveToEx(hdc, 20, 10, NULL);
+				LineTo(hdc, 20, 2);
+			}
+			
+			/*SelectPen(hdc, yellow_pen);
+			MoveToEx(hdc, 20, 10, NULL);
+			LineTo(hdc, 20, 50);
+			SelectPen(hdc, red_pen);
+			MoveToEx(hdc, 20, 10, NULL);
+			LineTo(hdc, 20, 2);*/
+
+			
+			FLOAT buffer_peaks[128];
+			FLOAT buffer_flatOff[128];
+			BASS_ChannelGetData(_this->hStream, buffer_peaks, BASS_DATA_FFT256);
+			BASS_ChannelGetData(_this->hStream, buffer_flatOff, BASS_DATA_FFT256);
+			
+			EndPaint(hWnd, &ps);
+			ReleaseDC(hWnd, hdc);
+
+			break;
+		}
 		case WM_CLOSE:
 		{
 			/*
@@ -615,14 +666,14 @@ VOID Application::setRangeTrackBarPlaySong(HSTREAM stream)
 */
 VOID Application::ControlSpectr(HWND hWnd)
 {
-	FLOAT buffer[128];
+	/*FLOAT buffer[128];
 	BASS_ChannelGetData(hStream, buffer, BASS_DATA_FFT256);
 	INT idx = 10;
 	for (INT i = 0; i < 44; i++)
 	{
 		SendMessage(spectrs[i], PBM_SETPOS, buffer[idx] * 3 * 368 - 4, 0);
 		idx++;
-	}
+	}*/	
 }
 /*
 	Setting color and range spectr
@@ -654,5 +705,6 @@ VOID Application::SetNullPosSpectr()
 	for (INT i = 0; i < 44; i++)
 	{
 		SendMessage(spectrs[i], PBM_SETPOS, TRUE, (LPARAM)0);
+		ShowWindow(spectrs[i], SW_HIDE);
 	}
 }
