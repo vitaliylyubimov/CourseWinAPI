@@ -1,6 +1,6 @@
 #include "DlgPlayList.h"
 #include "Application.h"
-//Pointer
+
 DlgPlayList* DlgPlayList::_this = NULL;
 /*
 	Contructor
@@ -149,7 +149,7 @@ VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR*path)
 	INT min = seconds / 60;													//Определение минут
 	seconds = seconds % 60;													//Определение секунд
 	/*
-		Заполнение данных о песне
+		Fiiling data of the songs
 	*/
 	if (id3 == NULL || strlen(id3->artist) == 0)
 	{
@@ -166,7 +166,7 @@ VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR*path)
 			name[k] = path[i];
 			k++;
 		}
-		name[k - 4] = '\0';	//Удалить формат
+		name[k - 4] = '\0';			//Delete format songs
 		infoAboutTheSong << name << "               ";
 	}
 	else
@@ -209,8 +209,8 @@ VOID DlgPlayList::Cls_OnContextMenu(HWND hwnd, HWND hwndContext, UINT xPos, UINT
 */
 BOOL me_strcmp(CHAR *str1, CHAR* str2)
 {
-	INT len = strlen(str1);				//длина строки с которой сравниваем
-	INT count = 0;						//количество совпавших символов
+	INT len = strlen(str1);				//Length string
+	INT count = 0;						//Count of matched symbols (Количество совпавших символов)
 	for (INT i = 0; i < len; i++)
 	{
 		if (str1[i] == str2[i])
@@ -231,20 +231,20 @@ DWORD WINAPI Thread(LPVOID lp)
 	DWORD dwCount = DragQueryFileA(hDrop, 0xFFFFFFFF, szFileName, MAX_PATH);
 	for (INT i = 0; i < dwCount; i++)
 	{
-		DragQueryFileA(hDrop, i, szFileName, MAX_PATH);			//определения пути к файлу
+		DragQueryFileA(hDrop, i, szFileName, MAX_PATH);			//definition path to file
 		INT len = strlen(szFileName);
-		CHAR tmp[4];					//буфер в который будет помещаться расширение файла, которое поступает в PlayList
-		INT j = 0;						//счетчик для буфера расширения
+		CHAR buffFormat[4];								//buff format songs
+		INT j = 0;										//by buff format
 		for (INT i = len - 4; i < len; i++)
 		{
-			tmp[j] = szFileName[i];
+			buffFormat[j] = szFileName[i];
 			j++;
 		}
-		if (me_strcmp(".mp3", tmp))
+		if (me_strcmp(".mp3", buffFormat))
 		{
-			HSTREAM stream = BASS_StreamCreateFile(0, szFileName, 0, 0, 0);
-			mbstowcs(buff, szFileName, MAX_PATH);			//Из CHAR в TCHAR
-			DlgPlayList::_this->addSongToPlayList(stream, buff);
+			HSTREAM stream = BASS_StreamCreateFile(0, szFileName, 0, 0, 0);			//Create handle 
+			mbstowcs(buff, szFileName, MAX_PATH);					//CHAR to TCHAR
+			DlgPlayList::_this->addSongToPlayList(stream, buff);			//Add songs to playlist
 		}
 	}
 	DragFinish(hDrop);
@@ -267,6 +267,7 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 {
 	switch (uMsg)
 	{
+		HANDLE_MSG(hWnd, WM_CONTEXTMENU, _this->Cls_OnContextMenu);
 		case WM_COMMAND:
 		{
 			switch (LOWORD(wParam))
@@ -322,18 +323,15 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			}
 			break;
 		}
-		case WM_PAINT:
-		{
-			
-			break;
-		}
+		/*
+			Processing WM_DROPFILES
+		*/
 		case WM_DROPFILES:
 		{
 			HDROP hDrop = (HDROP)wParam;
 			HANDLE hThread = CreateThread(0, 0, Thread, hDrop, 0, 0);			//Запуск отдельного потока для загрузки музыки в PlayList
 			break;
 		}
-		HANDLE_MSG(hWnd, WM_CONTEXTMENU, _this->Cls_OnContextMenu);
 	}
 	return CallWindowProc(_this->origProcContextMenu, hWnd, uMsg, wParam, lParam);
 }

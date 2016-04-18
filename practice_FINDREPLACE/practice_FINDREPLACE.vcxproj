@@ -86,6 +86,7 @@
     <ClInclude Include="DlgEqualizer.h" />
     <ClInclude Include="DlgPlayList.h" />
     <ClInclude Include="include.h" />
+    <ClInclude Include="MeDefines.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="structSong.h" />
   </ItemGroup>
@@ -100,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="BMP\bckg.bmp" />
+    <Image Include="BMP\equalizerBckg.bmp" />
     <Image Include="ICON\AudioPleer.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -36,6 +36,9 @@
     <ClInclude Include="DlgEqualizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MeDefines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -61,6 +64,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="BMP\bckg.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\equalizerBckg.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

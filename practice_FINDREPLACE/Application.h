@@ -10,14 +10,15 @@ private:
 	DlgEqualizer equalizer;							//Class object Equalizer
 	HWND hTBSoundVolume;							//TRackBar - volume 
 	HWND hTBPlayingSong;							//TRackBAr - current time songs
+	HWND hSlider_Balance;							//Slider balance
 	UINT id_timer;									//ID timer time by current playing songs
 	UINT idTimerBySpectr;							//ID timer by Spectr
 	INT secPlaying;									//Count of seconds played of the current song
 	HWND spectrs[44];								//Columns spectrs
 	HICON hIcon;									//Icon pleer
 	BOOL IsRepeatSong;								//Replay
-public:
 	HSTREAM hStream;								//Поток воспроизведения песни
+public:
 	Application(VOID);								//конструктор по умолчанию
 	~Application();									//деструктор
 	static Application* _this;						//собственный указатель

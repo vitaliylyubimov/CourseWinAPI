@@ -1,11 +1,8 @@
 #include "Application.h"
 
-/*
-	Инициализация собственного указателя
-*/
 Application* Application::_this = NULL;
 /*
-	Конструктор (по умолчанию)
+	Constructor 
 */
 Application::Application(VOID)
 {	
@@ -21,14 +18,14 @@ Application::Application(VOID)
 	IsRepeatSong = FALSE;				//повтор песни
 }
 /*
-	Деструктор
+	Destructor
 */
 Application::~Application()
 {
 	ReleaseMutex(hMutex);
 }
 /*
-	Проверка версии BASS и Инициализация устройства 
+	Check version BASS and initialization device 
 */
 INT Application::CheckedInitBASS()
 {
@@ -44,7 +41,7 @@ INT Application::CheckedInitBASS()
 	}
 }
 /*
-	Проверка на открытие копий приложения
+	Check opening coping application 
 */
 VOID Application::CheckOpeningCopy(HWND hwnd)
 {
@@ -60,14 +57,14 @@ VOID Application::CheckOpeningCopy(HWND hwnd)
 	}
 }
 /*
-	Запуск программы
+	Start programm
 */
 INT Application::runProgramm()
 {
 	return DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), NULL, DlgProc);
 }
 /*
-	Загрузка песни из компьютера
+	Load songs 
 */
 BOOL Application::openFile_LoadMusic(HWND hWnd)
 {
@@ -108,7 +105,7 @@ BOOL Application::openFile_LoadMusic(HWND hWnd)
 	return FALSE;
 }
 /*
-	Обработка WM_INITDIALOG
+	Processing WM_INITDIALOG
 */
 BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
@@ -139,6 +136,12 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	*/
 	hTBPlayingSong = GetDlgItem(hwnd, IDC_SLIDER_TIMEPLAYING);
 	/*
+		Slider balance
+	*/
+	hSlider_Balance = GetDlgItem(hwnd, IDC_SLIDERBALANCE);
+	SendMessage(hSlider_Balance, TBM_SETPOS, TRUE, (LPARAM)50);
+	SendMessage(hSlider_Balance, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(-5, 5));
+	/*
 		Create wnd playList
 	*/
 	dlg.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGPLAYLIST), hwnd, dlg.DlgProc);
@@ -157,20 +160,37 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 */
 VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 {
-	if (hwndCtl == hTBSoundVolume)								//настройка регулятора громкости
+	/*
+		Volume
+	*/
+	if (hwndCtl == hTBSoundVolume)											//Adjusting the volume control (Настройка регулятора громкости)
 	{
 		INT p = SendMessage(hTBSoundVolume, TBM_GETPOS, NULL, NULL);
+		//SendMessage(hTBSoundVolume, TBM_SETPOS, TRUE, (LPARAM)p / 10);
+		//BASS_ChannelSetAttribute(hStream, BASS_ATTRIB_VOL, p / 100);
 		BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, p * 100);
 		BASS_SetVolume(p / 100.f);
+		
 	}
-	else if (hwndCtl == hTBPlayingSong)							//положение играющей песни 
+	/*
+		Time playing
+	*/	
+	else if (hwndCtl == hTBPlayingSong)										//playing song position
 	{
-		INT nPos = 0;				//новая позиция
-		nPos = SendMessage(hTBPlayingSong, TBM_GETPOS, 0, 0);				//получение новой позиции
-		secPlaying = nPos;													//секунды проигрывания = текущей позиции
-		QWORD bytePos = BASS_ChannelSeconds2Bytes(hStream, nPos);			//перевод позиции в байты (для перемотки)
-		BASS_ChannelSetPosition(hStream, bytePos, BASS_POS_BYTE);			//перемотка в байтах
-		SendMessage(hTBPlayingSong, TBM_SETPOS, TRUE, (LPARAM)nPos);		//перевод позиции на слайдере
+		INT nPos = 0;														//new position
+		nPos = SendMessage(hTBPlayingSong, TBM_GETPOS, 0, 0);				//Get new position
+		secPlaying = nPos;													//Seconds playing = current position
+		QWORD bytePos = BASS_ChannelSeconds2Bytes(hStream, nPos);			//Translated seconds in bytes 
+		BASS_ChannelSetPosition(hStream, bytePos, BASS_POS_BYTE);			//Rewind in bytes
+		SendMessage(hTBPlayingSong, TBM_SETPOS, TRUE, (LPARAM)nPos);		//Translated position	
+	}
+	/*
+		Balance
+	*/
+	else if (hwndCtl == hSlider_Balance)
+	{
+		INT p = SendMessage(hSlider_Balance, TBM_GETPOS, NULL, NULL);
+		BASS_ChannelSetAttribute(Application::_this->hStream, BASS_ATTRIB_PAN, p / 5);
 	}
 }
 /*
@@ -419,11 +439,17 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 				SetTextColor(hDc, RGB(255, 255, 255));
 				return (LRESULT)GetStockObject(NULL_BRUSH);
 			}
-			else if (HWND(lParam) == GetDlgItem(hWnd, IDC_TRACKBARSOUND))
+			else if (HWND(lParam) == _this->hTBSoundVolume)
 			{
-				/*SetBkMode(hDc, TRANSPARENT);
-				SetTextColor(hDc, RGB(255, 255, 255));
-				return (LRESULT)GetStockObject(NULL_BRUSH);*/
+				//SetBkMode(hDc, TRANSPARENT);
+				//SetTextColor(hDc, RGB(255, 255, 255));
+				//return (LRESULT)GetStockObject(NULL_BRUSH);
+			}
+			else if (HWND(lParam) == _this->hSlider_Balance)
+			{
+				//SetBkMode(hDc, TRANSPARENT);
+				//SetTextColor(hDc, RGB(255, 255, 255));
+				//return (LRESULT)GetStockObject(NULL_BRUSH);
 			}
 			break;
 		}
@@ -461,7 +487,11 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		}
 		case WM_CLOSE:
 		{
+			/*
+				Clear objects
+			*/
 			BASS_Free();
+			BASS_StreamFree(_this->hStream);
 			EndDialog(hWnd, NULL);
 			break;
 		}
