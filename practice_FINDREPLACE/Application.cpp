@@ -233,7 +233,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 				BASS_Start();
 				BASS_ChannelPlay(hStream, 0);
 				SetTimer(hwnd, id_timer, 1000, 0);
-				SetTimer(hwnd, idTimerBySpectr, 100, 0);
+				SetTimer(hwnd, idTimerBySpectr, 100 , 0);
 			}
 			else
 			{
@@ -365,6 +365,7 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 	else if (id == idTimerBySpectr)
 	{
 		ControlSpectr(hwnd);
+		InvalidateRect(hwnd, &spectrRECT, TRUE);
 	}
 }
 /*
@@ -417,6 +418,7 @@ VOID Application::AddIconInTray(HWND hWnd)
 HBRUSH OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
 	static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP1)));
+	//static HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	return brush;
 }
 /*
@@ -435,9 +437,6 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		case WM_CTLCOLORSTATIC:
 		{
 			HDC hDc = (HDC)wParam;
-			/*SetBkMode(hDc, TRANSPARENT);
-			SetTextColor(hDc, RGB(255, 255, 255));
-			return (LRESULT)GetStockObject(BLACK_BRUSH);*/
 			if (HWND(lParam) == GetDlgItem(hWnd, IDC_CHECKPLAYLIST))
 			{
 				SetBkMode(hDc, TRANSPARENT);
@@ -507,47 +506,43 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			GetClientRect(hWnd, &rect);
 			static INT height = rect.bottom / 2 - 10;
 			/*
-				Black brush
+				Initialization size rectangle by redraw spectrum
 			*/
-			HBRUSH black_brush = CreateSolidBrush(RGB(0, 0, 0));	
-			SelectObject(hdc, black_brush);
-			Rectangle(hdc, rect.left + 15, rect.top, rect.right - 15, height);
+			_this->spectrRECT.left = rect.left;
+			_this->spectrRECT.top = rect.top;
+			_this->spectrRECT.right = rect.right;
+			_this->spectrRECT.bottom = height;
 			/*
 				Yellow pen
 			*/
-			HPEN yellow_pen = CreatePen(PS_DOT, 3, RGB(255, 245, 0));
+			HBRUSH yellow_brush = CreateSolidBrush(RGB(0, 0, 0));
 			/*
 				Red pen
 			*/
-			HPEN red_pen = CreatePen(PS_DOT, 1.5, RGB(255, 0, 0));
+			HPEN red_pen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+			int x;
+			int y = height;
+			int offset = 35;
+			int columns = 77;			//count columns
+			int w = (rect.right - rect.left - 35) / columns ; // ширина столбика
+			FLOAT buffer_peaks[128] = { height };
+			BASS_ChannelGetData(_this->hStream, buffer_peaks, BASS_DATA_FFT256);
 
-			
-			for (int i = 0; i < 128;i++)
+			for (int i = 0; i < columns;i++)
 			{
 				SelectPen(hdc, red_pen);
-				MoveToEx(hdc, i + rect.left + 15 + 3, 15, NULL);
-				LineTo(hdc, i + rect.left + 15, 15);
-				SelectPen(hdc, yellow_pen);
-				MoveToEx(hdc, 20, 10, NULL);
-				LineTo(hdc, 20, 2);
+				x = rect.left + offset + w * i;
+				y = abs(buffer_peaks[i] * 400 * 3 - height);
+				if (y > height)
+					y = height;
+				SelectObject(hdc, yellow_brush);				
+				SelectPen(hdc, red_pen);
+				if(height - y > 1)
+					Rectangle(hdc, x, y, x + w, height);
 			}
-			
-			/*SelectPen(hdc, yellow_pen);
-			MoveToEx(hdc, 20, 10, NULL);
-			LineTo(hdc, 20, 50);
-			SelectPen(hdc, red_pen);
-			MoveToEx(hdc, 20, 10, NULL);
-			LineTo(hdc, 20, 2);*/
-
-			
-			FLOAT buffer_peaks[128];
-			FLOAT buffer_flatOff[128];
-			BASS_ChannelGetData(_this->hStream, buffer_peaks, BASS_DATA_FFT256);
-			BASS_ChannelGetData(_this->hStream, buffer_flatOff, BASS_DATA_FFT256);
 			
 			EndPaint(hWnd, &ps);
 			ReleaseDC(hWnd, hdc);
-
 			break;
 		}
 		case WM_CLOSE:
@@ -666,14 +661,14 @@ VOID Application::setRangeTrackBarPlaySong(HSTREAM stream)
 */
 VOID Application::ControlSpectr(HWND hWnd)
 {
-	/*FLOAT buffer[128];
+	FLOAT buffer[128];
 	BASS_ChannelGetData(hStream, buffer, BASS_DATA_FFT256);
 	INT idx = 10;
 	for (INT i = 0; i < 44; i++)
 	{
 		SendMessage(spectrs[i], PBM_SETPOS, buffer[idx] * 3 * 368 - 4, 0);
 		idx++;
-	}*/	
+	}
 }
 /*
 	Setting color and range spectr

@@ -6,6 +6,7 @@
 class Application
 {
 private:
+	RECT spectrRECT;
 	HANDLE hMutex;
 	DlgPlayList dlg;								//Class object PlayList
 	DlgEqualizer equalizer;							//Class object Equalizer
