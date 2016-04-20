@@ -153,6 +153,7 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		Set the position of the spectrum to null
 	*/
 	SetNullPosSpectr();
+
 	/*
 	// Set WS_EX_LAYERED on this window 
 	SetWindowLong(hwnd,

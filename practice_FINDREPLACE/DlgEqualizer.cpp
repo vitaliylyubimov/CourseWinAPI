@@ -119,13 +119,6 @@ VOID DlgEqualizer::Cls_OnVScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 VOID DlgEqualizer::SetFX(HSTREAM stream)
 {
 	/*
-		Set positions equalizer
-	*/
-	for (int i = 0; i < 10;i++)
-	{
-		//SendMessage(hSlidersEqualizer[i], TBM_SETPOS, TRUE, (LPARAM)15);		
-	}
-	/*
 		Set FX by device
 	*/
 	for (int i = 0;i < 10;i++)
@@ -157,7 +150,6 @@ BOOL DlgEqualizer::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	for (int i = 0; i < 10;i++)
 	{
 		SendMessage(hSlidersEqualizer[i], TBM_SETRANGE, TRUE, (LPARAM)MAKELPARAM(0, 15));
-		//SendMessage(hSlidersEqualizer[i], TBM_SETPOS, TRUE, (LPARAM)15);
 	}
 	return TRUE;
 }
