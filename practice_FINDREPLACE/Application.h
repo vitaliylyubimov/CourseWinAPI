@@ -31,7 +31,7 @@ public:
 	VOID Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos);									//WM_HSCROLL
 	VOID Cls_OnTimer(HWND hwnd, UINT id);																//WM_TIMER
 	VOID Cls_OnSysCommand(HWND hwnd, UINT cmd, INT x, INT y);											//WM_SYSCOMMAND
-	
+	VOID Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlags);
 	INT runProgramm();									//старт программы
 	INT CheckedInitBASS();								//проверка инициализации BASS
 	BOOL openFile_LoadMusic(HWND hWnd);					//открытие песни с компьютера OPENFILENAME

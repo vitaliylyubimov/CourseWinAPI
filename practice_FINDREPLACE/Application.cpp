@@ -331,6 +331,16 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			}
 			break;
 		}
+		case IDC_SPECTR_AUTOCOLUMNS:
+		{
+			
+			break;
+		}
+		case IDC_SPECTR_MANUALLYCOLUMNS:
+		{
+			
+			break;
+		}
 		default:
 			break;
 	}
@@ -413,6 +423,20 @@ VOID Application::AddIconInTray(HWND hWnd)
 	ShowWindow(hWnd, SW_HIDE);
 }
 /*
+	Processing WM_RBUTTONDOWN
+*/
+VOID Application::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlags)
+{
+	HMENU hContextMenu = CreatePopupMenu();
+	HMENU hSkins = CreatePopupMenu();
+	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hSkins, TEXT("Skins equalizer"));
+	AppendMenu(hSkins, MF_STRING, IDC_SPECTR_AUTOCOLUMNS, TEXT("&Skin1"));
+	AppendMenu(hSkins, MF_STRING, IDC_SPECTR_MANUALLYCOLUMNS, TEXT("&Skin2"));
+	POINT p;
+	GetCursorPos(&p);
+	TrackPopupMenu(hContextMenu, TPM_LEFTALIGN, p.x, p.y, 0, hwnd, 0);
+}
+/*
 	Fnct loading bckg
 */
 HBRUSH OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
@@ -434,6 +458,7 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		HANDLE_MSG(hWnd, WM_HSCROLL, _this->Cls_OnHScroll);
 		HANDLE_MSG(hWnd, WM_COMMAND, _this->Cls_OnCommand);
 		HANDLE_MSG(hWnd, WM_SYSCOMMAND, _this->Cls_OnSysCommand);
+		HANDLE_MSG(hWnd, WM_RBUTTONDOWN, _this->Cls_OnRButtonDown);
 		case WM_CTLCOLORSTATIC:
 		{
 			HDC hDc = (HDC)wParam;

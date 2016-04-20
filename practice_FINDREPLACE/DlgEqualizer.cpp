@@ -123,7 +123,7 @@ VOID DlgEqualizer::SetFX(HSTREAM stream)
 	*/
 	for (int i = 0; i < 10;i++)
 	{
-		SendMessage(hSlidersEqualizer[i], TBM_SETPOS, TRUE, (LPARAM)15);		
+		//SendMessage(hSlidersEqualizer[i], TBM_SETPOS, TRUE, (LPARAM)15);		
 	}
 	/*
 		Set FX by device
@@ -157,7 +157,7 @@ BOOL DlgEqualizer::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	for (int i = 0; i < 10;i++)
 	{
 		SendMessage(hSlidersEqualizer[i], TBM_SETRANGE, TRUE, (LPARAM)MAKELPARAM(0, 15));
-		SendMessage(hSlidersEqualizer[i], TBM_SETPOS, TRUE, (LPARAM)15);
+		//SendMessage(hSlidersEqualizer[i], TBM_SETPOS, TRUE, (LPARAM)15);
 	}
 	return TRUE;
 }
