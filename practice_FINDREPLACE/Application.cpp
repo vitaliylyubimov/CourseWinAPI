@@ -70,6 +70,14 @@ VOID Application::ColorContourSpectrum(INT r, INT g, INT b)
 	contour_green = g;
 	contour_blue = b;
 }
+VOID Application::TransparencyWindow(HWND hWnd, INT value)
+{
+	// Set WS_EX_LAYERED on this window
+	SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+
+	// Make this window 70% alpha
+	SetLayeredWindowAttributes(hWnd, 0, (255 * value) / 100, LWA_ALPHA);
+}
 /*
 	Start programm
 */
@@ -134,7 +142,7 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	/*
 		Load icon
 	*/	
-	hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON1));
+	HICON hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON1));
 	SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon);		
 	/*
 		Slider volume
@@ -159,15 +167,9 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		Create Equalizer
 	*/
 	equalizer.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGEQUALIZER), hwnd, equalizer.DlgProc);
-	
-	/*
-	// Set WS_EX_LAYERED on this window 
-	SetWindowLong(hwnd,
-		GWL_EXSTYLE,
-		GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
 
-	// Make this window 70% alpha
-	SetLayeredWindowAttributes(hwnd, 0, (255 * 100) / 100, LWA_ALPHA);*/
+	HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAP1));
+	SendDlgItemMessage(hwnd, IDC_REPEATSONG, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
 	return TRUE;
 }
 /*
@@ -361,6 +363,11 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			ColorContourSpectrum(255, 255, 255);
 			break;
 		}
+		case COLOR_CONTOUR_BLACK:
+		{
+			ColorContourSpectrum(0, 0, 0);
+			break;
+		}
 		/*
 			Colors fill
 		*/
@@ -382,6 +389,64 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 		case COLOR_FILL_WHITE:
 		{
 			ColorFillSpectrum(255, 255, 255);
+			break;
+		}
+		case COLOR_FILL_BLACK:
+		{
+			ColorFillSpectrum(0, 0, 0);
+			break;
+		}
+		/*
+			Transparency window
+		*/
+		case TRANSPARENCY_100:
+		{
+			TransparencyWindow(hwnd, 100);
+			break;
+		}
+		case TRANSPARENCY_90:
+		{
+			TransparencyWindow(hwnd, 90);
+			break;
+		}
+		case TRANSPARENCY_80:
+		{
+			TransparencyWindow(hwnd, 80);
+			break;
+		}
+		case TRANSPARENCY_70:
+		{
+			TransparencyWindow(hwnd, 70);
+			break;
+		}
+		case TRANSPARENCY_60:
+		{
+			TransparencyWindow(hwnd, 60);
+			break;
+		}
+		case TRANSPARENCY_50:
+		{
+			TransparencyWindow(hwnd, 50);
+			break;
+		}
+		case TRANSPARENCY_40:
+		{
+			TransparencyWindow(hwnd, 40);
+			break;
+		}
+		case TRANSPARENCY_30:
+		{
+			TransparencyWindow(hwnd, 30);
+			break;
+		}
+		case TRANSPARENCY_20:
+		{
+			TransparencyWindow(hwnd, 20);
+			break;
+		}
+		case TRANSPARENCY_10:
+		{
+			TransparencyWindow(hwnd, 10);
 			break;
 		}
 		default:
@@ -473,6 +538,7 @@ VOID Application::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, 
 	HMENU hColor = CreatePopupMenu();
 	HMENU hColorContour = CreatePopupMenu();
 	HMENU hColorFill = CreatePopupMenu();
+	HMENU hTranperency = CreatePopupMenu();
 	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hColor, TEXT("Color spectrum"));
 
 	AppendMenu(hColor, MF_STRING | MF_POPUP, (INT_PTR)hColorContour, TEXT("Color contour"));
@@ -482,14 +548,34 @@ VOID Application::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, 
 	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_GREEN, TEXT("Green"));
 	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_BLUE, TEXT("Blue"));
 	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_WHITE, TEXT("White"));
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_BLACK, TEXT("Black"));
 	
 	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_RED, TEXT("Red"));
 	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_GREEN, TEXT("Green"));
 	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_BLUE, TEXT("Blue"));
 	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_WHITE, TEXT("White"));
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_BLACK, TEXT("Black"));
+
+	/*
+		Transperency
+	*/
+	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hTranperency, TEXT("Transparency window"));
+
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_100, TEXT("100%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_90, TEXT("90%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_80, TEXT("80%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_70, TEXT("70%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_60, TEXT("60%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_50, TEXT("50%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_40, TEXT("40%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_30, TEXT("30%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_20, TEXT("20%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_10, TEXT("10%"));
+
 	POINT p;
 	GetCursorPos(&p);
 	TrackPopupMenu(hContextMenu, TPM_LEFTALIGN, p.x, p.y, 0, hwnd, 0);
+
 }
 /*
 	Fnct loading bckg

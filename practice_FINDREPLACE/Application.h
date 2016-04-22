@@ -16,7 +16,6 @@ private:
 	UINT id_timer;									//ID timer time by current playing songs
 	UINT idTimerBySpectr;							//ID timer by Spectr
 	INT secPlaying;									//Count of seconds played of the current song
-	HICON hIcon;									//Icon pleer
 	BOOL IsRepeatSong;								//Replay
 	HSTREAM hStream;								//Поток воспроизведения песни
 	INT contour_red, contour_green, contour_blue;	//
@@ -47,5 +46,6 @@ public:
 	VOID CheckOpeningCopy(HWND hwnd);					//Проверка на открытие копий приложения
 	VOID ColorFillSpectrum(INT r, INT g, INT b);
 	VOID ColorContourSpectrum(INT r, INT g, INT b);
+	VOID TransparencyWindow(HWND hWnd, INT value);
 	friend class DlgPlayList;
 };
