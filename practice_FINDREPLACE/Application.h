@@ -16,10 +16,11 @@ private:
 	UINT id_timer;									//ID timer time by current playing songs
 	UINT idTimerBySpectr;							//ID timer by Spectr
 	INT secPlaying;									//Count of seconds played of the current song
-	HWND spectrs[44];								//Columns spectrs
 	HICON hIcon;									//Icon pleer
 	BOOL IsRepeatSong;								//Replay
 	HSTREAM hStream;								//Поток воспроизведения песни
+	INT contour_red, contour_green, contour_blue;	//
+	INT fill_red, fill_green, fill_blue;			//
 public:
 	Application(VOID);								//конструктор по умолчанию
 	~Application();									//деструктор
@@ -41,11 +42,10 @@ public:
 	VOID pause();										//Pause
 	VOID next();										//Next Song
 	VOID prev();										//Prev Song
-	VOID ControlSpectr(HWND hWnd);						//Контроль звуковых частот при проигрывании
-	VOID SetSpectrColor(HWND hWnd);						//Установка цвета визуализации
-	VOID SetNullPosSpectr();							//Установка визуализации на 0 (При нажатии на Паузу/Стоп)
 	VOID DeleteIconOfTray(HWND hWnd);					//Разворачивание окна из трея
 	VOID AddIconInTray(HWND hWnd);						//Сворачивание окна в Трей
 	VOID CheckOpeningCopy(HWND hwnd);					//Проверка на открытие копий приложения
+	VOID ColorFillSpectrum(INT r, INT g, INT b);
+	VOID ColorContourSpectrum(INT r, INT g, INT b);
 	friend class DlgPlayList;
 };

@@ -16,6 +16,8 @@ Application::Application(VOID)
 	id_timer = 0;						//ID timer by PlayingSongs
 	idTimerBySpectr = 1;				//ID timer by Spectrum
 	IsRepeatSong = FALSE;				//повтор песни
+	contour_red = contour_green = contour_blue = 255;
+	fill_red = fill_green = fill_blue = 0;
 }
 /*
 	Destructor
@@ -55,6 +57,18 @@ VOID Application::CheckOpeningCopy(HWND hwnd)
 		MessageBox(hwnd, ss.str().c_str(), TEXT("Information"), MB_ICONEXCLAMATION);
 		EndDialog(hwnd, 0);
 	}
+}
+VOID Application::ColorFillSpectrum(INT r, INT g, INT b)
+{
+	fill_red = r;
+	fill_green = g;
+	fill_blue = b;
+}
+VOID Application::ColorContourSpectrum(INT r, INT g, INT b)
+{
+	contour_red = r;
+	contour_green = g;
+	contour_blue = b;
 }
 /*
 	Start programm
@@ -118,10 +132,6 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	*/
 	SetWindowText(hwnd, NAMEPLEER);
 	/*
-		Color visualization
-	*/
-	SetSpectrColor(hwnd);
-	/*
 		Load icon
 	*/	
 	hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON1));
@@ -149,11 +159,7 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		Create Equalizer
 	*/
 	equalizer.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGEQUALIZER), hwnd, equalizer.DlgProc);
-	/*
-		Set the position of the spectrum to null
-	*/
-	SetNullPosSpectr();
-
+	
 	/*
 	// Set WS_EX_LAYERED on this window 
 	SetWindowLong(hwnd,
@@ -332,14 +338,50 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			}
 			break;
 		}
-		case IDC_SPECTR_AUTOCOLUMNS:
+		/*
+			Colors contour
+		*/
+		case COLOR_CONTOUR_RED:
 		{
-			
+			ColorContourSpectrum(255, 0, 0);
 			break;
 		}
-		case IDC_SPECTR_MANUALLYCOLUMNS:
+		case COLOR_CONTOUR_GREEN:
 		{
-			
+			ColorContourSpectrum(0, 255, 0);
+			break;
+		}
+		case COLOR_CONTOUR_BLUE:
+		{
+			ColorContourSpectrum(0, 0, 255);
+			break;
+		}
+		case COLOR_CONTOUR_WHITE:
+		{
+			ColorContourSpectrum(255, 255, 255);
+			break;
+		}
+		/*
+			Colors fill
+		*/
+		case COLOR_FILL_RED:
+		{
+			ColorFillSpectrum(255, 0, 0);
+			break;
+		}
+		case COLOR_FILL_GREEN:
+		{
+			ColorFillSpectrum(0, 255, 0);
+			break;
+		}
+		case COLOR_FILL_BLUE:
+		{
+			ColorFillSpectrum(0, 0, 255);
+			break;
+		}
+		case COLOR_FILL_WHITE:
+		{
+			ColorFillSpectrum(255, 255, 255);
 			break;
 		}
 		default:
@@ -375,7 +417,6 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 	}
 	else if (id == idTimerBySpectr)
 	{
-		ControlSpectr(hwnd);
 		InvalidateRect(hwnd, &spectrRECT, TRUE);
 	}
 }
@@ -429,10 +470,23 @@ VOID Application::AddIconInTray(HWND hWnd)
 VOID Application::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlags)
 {
 	HMENU hContextMenu = CreatePopupMenu();
-	HMENU hSkins = CreatePopupMenu();
-	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hSkins, TEXT("Skins equalizer"));
-	AppendMenu(hSkins, MF_STRING, IDC_SPECTR_AUTOCOLUMNS, TEXT("&Skin1"));
-	AppendMenu(hSkins, MF_STRING, IDC_SPECTR_MANUALLYCOLUMNS, TEXT("&Skin2"));
+	HMENU hColor = CreatePopupMenu();
+	HMENU hColorContour = CreatePopupMenu();
+	HMENU hColorFill = CreatePopupMenu();
+	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hColor, TEXT("Color spectrum"));
+
+	AppendMenu(hColor, MF_STRING | MF_POPUP, (INT_PTR)hColorContour, TEXT("Color contour"));
+	AppendMenu(hColor, MF_STRING | MF_POPUP, (INT_PTR)hColorFill, TEXT("Color fill"));
+
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_RED, TEXT("Red"));
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_GREEN, TEXT("Green"));
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_BLUE, TEXT("Blue"));
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_WHITE, TEXT("White"));
+	
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_RED, TEXT("Red"));
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_GREEN, TEXT("Green"));
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_BLUE, TEXT("Blue"));
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_WHITE, TEXT("White"));
 	POINT p;
 	GetCursorPos(&p);
 	TrackPopupMenu(hContextMenu, TPM_LEFTALIGN, p.x, p.y, 0, hwnd, 0);
@@ -442,8 +496,8 @@ VOID Application::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, 
 */
 HBRUSH OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
-	static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP1)));
-	//static HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
+	//static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP1)));
+	static HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	return brush;
 }
 /*
@@ -541,11 +595,21 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			/*
 				Yellow pen
 			*/
-			HBRUSH yellow_brush = CreateSolidBrush(RGB(0, 0, 0));
+			HBRUSH black_brush = CreateSolidBrush
+				(
+				RGB(_this->fill_red, 
+					_this->fill_green, 
+					_this->fill_blue)
+				);
 			/*
 				Red pen
 			*/
-			HPEN red_pen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+			HPEN red_pen = CreatePen
+				(PS_SOLID, 1, 
+					RGB(_this->contour_red, 
+						_this->contour_green,
+						_this->contour_blue)
+				);
 			int x;
 			int y = height;
 			int offset = 35;
@@ -561,7 +625,7 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 				y = abs(buffer_peaks[i] * 400 * 3 - height);
 				if (y > height)
 					y = height;
-				SelectObject(hdc, yellow_brush);				
+				SelectObject(hdc, black_brush);				
 				SelectPen(hdc, red_pen);
 				if(height - y > 1)
 					Rectangle(hdc, x, y, x + w, height);
@@ -593,7 +657,6 @@ VOID Application::stop(HSTREAM stream)
 {
 	BASS_Stop();
 	BASS_ChannelStop(stream);
-	SetNullPosSpectr();
 }
 /*
 	Play
@@ -610,7 +673,6 @@ VOID Application::play(HSTREAM stream)
 VOID Application::pause()
 {
 	BASS_Pause();
-	SetNullPosSpectr();
 }
 /*
 	Prev song
@@ -681,51 +743,4 @@ VOID Application::setRangeTrackBarPlaySong(HSTREAM stream)
 	QWORD len = BASS_ChannelGetLength(stream, BASS_POS_BYTE);
 	INT seconds = BASS_ChannelBytes2Seconds(stream, len);
 	SendMessage(hTBPlayingSong, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(0, seconds + 1));
-}
-/*
-	Spectrum
-*/
-VOID Application::ControlSpectr(HWND hWnd)
-{
-	FLOAT buffer[128];
-	BASS_ChannelGetData(hStream, buffer, BASS_DATA_FFT256);
-	INT idx = 10;
-	for (INT i = 0; i < 44; i++)
-	{
-		SendMessage(spectrs[i], PBM_SETPOS, buffer[idx] * 3 * 368 - 4, 0);
-		idx++;
-	}
-}
-/*
-	Setting color and range spectr
-*/
-VOID Application::SetSpectrColor(HWND hWnd)
-{
-	INT color = 255;
-	for (INT i = 0; i < 44; i++)
-	{
-		spectrs[i] = GetDlgItem(hWnd, i + 1032);
-		SendMessage(spectrs[i], PBM_SETBKCOLOR, 0, (LPARAM)RGB(0, 0, 0));
-		if (i > 35)
-			SendMessage(spectrs[i], PBM_SETRANGE32, 0, 80);
-		if (i <= 15)
-			color -= 5;
-		else if (i <= 30 && i > 15)
-			color -= 3;
-		else
-			color += 10;
-
-		SendMessage(spectrs[i], PBM_SETBARCOLOR, 0, (LPARAM)RGB(color, color, color));
-	}
-}
-/*
-	Set the position of the spectrum to null (Clicked Pause/Stop)
-*/
-VOID Application::SetNullPosSpectr()
-{
-	for (INT i = 0; i < 44; i++)
-	{
-		SendMessage(spectrs[i], PBM_SETPOS, TRUE, (LPARAM)0);
-		ShowWindow(spectrs[i], SW_HIDE);
-	}
 }
