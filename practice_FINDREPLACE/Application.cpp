@@ -142,7 +142,7 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	/*
 		Load icon
 	*/	
-	HICON hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON1));
+	hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON1));
 	SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon);		
 	/*
 		Slider volume
@@ -458,7 +458,6 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 */
 VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 {
-	static HWND hStaticTimePlaying = GetDlgItem(hwnd, IDC_STATICTIMEPLAYING);
 	if (id == id_timer)
 	{
 		secPlaying++;
@@ -474,7 +473,7 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 			secPlaying = 0;
 			play(hStream);
 		}
-		else if (dlg.songs.size() == 0 && secPlaying == seconds)
+		else if (dlg.songs.size() == 1 && secPlaying == seconds)
 		{
 			secPlaying = 0;
 			KillTimer(hwnd, id_timer);

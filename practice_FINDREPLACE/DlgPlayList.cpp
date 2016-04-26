@@ -1,6 +1,7 @@
 #include "DlgPlayList.h"
 #include "Application.h"
 
+
 DlgPlayList* DlgPlayList::_this = NULL;
 /*
 	Contructor
@@ -92,7 +93,9 @@ VOID DlgPlayList::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 		}
 		case IDC_ADDSONG:
 		{
-			SendMessage(GetParent(hwnd), WM_COMMAND, IDC_ADDSONG, 0);
+			//SavePlayList();
+			LoadPlayList();
+			//SendMessage(GetParent(hwnd), WM_COMMAND, IDC_ADDSONG, 0);
 			break;
 		}
 		default:
@@ -334,4 +337,35 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		}
 	}
 	return CallWindowProc(_this->origProcContextMenu, hWnd, uMsg, wParam, lParam);
+}
+/*
+	Save the playlist to file 
+*/
+VOID DlgPlayList::SavePlayList()
+{
+	std::ofstream fout("f.bin", std::ios::binary);
+	for (int i = 0;i < songs.size();i++)
+	{
+		fout.write((char*)&songs[i], sizeof(infoSong));
+	}
+	fout.close();
+}
+/*
+	Load the playlist to file
+*/
+VOID DlgPlayList::LoadPlayList()
+{
+	std::ifstream fin("f.bin", std::ios::binary);
+	infoSong iS;
+	if (fin.is_open())
+	{
+		while(!fin.eof())
+		{
+			infoSong iS;
+			fin.read((char*)&iS, sizeof(infoSong));
+			songs.push_back(iS);
+			addSongToPlayList(iS.hStream, iS.path);
+		}
+		fin.close();
+	}
 }
