@@ -93,9 +93,17 @@ VOID DlgPlayList::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 		}
 		case IDC_ADDSONG:
 		{
-			//SavePlayList();
+			SendMessage(GetParent(hwnd), WM_COMMAND, IDC_ADDSONG, 0);
+			break;
+		}
+		case IDC_SAVEPLAYLIST:
+		{
+			SavePlayList();
+			break;
+		}
+		case IDC_LOADPLAYLIST:
+		{
 			LoadPlayList();
-			//SendMessage(GetParent(hwnd), WM_COMMAND, IDC_ADDSONG, 0);
 			break;
 		}
 		default:
@@ -142,7 +150,7 @@ VOID DlgPlayList::showPlayList(INT isShow)
 /*
 	Add song in PlayList
 */
-VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR*path)
+VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR* path)
 {
 	TAG_ID3* id3 = (TAG_ID3*)BASS_ChannelGetTags(stream, BASS_TAG_ID3);
 	std::wstringstream infoAboutTheSong;									//Буфер строки (Название песни + Исполнитель + время)
@@ -150,7 +158,7 @@ VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR*path)
 	QWORD lengthSong = BASS_ChannelGetLength(stream, BASS_POS_BYTE);		//длина песни в байтах
 	INT seconds = BASS_ChannelBytes2Seconds(stream, lengthSong);			//длина песни в секундах
 	INT min = seconds / 60;													//Определение минут
-	seconds = seconds % 60;													//Определение секунд
+	seconds = seconds % 60;	//Определение секунд
 	/*
 		Fiiling data of the songs
 	*/
@@ -341,31 +349,39 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 /*
 	Save the playlist to file 
 */
+TCHAR tmp[260];
 VOID DlgPlayList::SavePlayList()
 {
-	std::ofstream fout("f.bin", std::ios::binary);
-	for (int i = 0;i < songs.size();i++)
+	FILE *f;
+	TCHAR buff[MAX_PATH];
+	if (!_wfopen_s(&f, TEXT("PlayList.txt"), TEXT("wb, ccs=UTF-8")))
 	{
-		fout.write((char*)&songs[i], sizeof(infoSong));
+		for (int i = 0;i < songs.size();i++)
+		{
+			songs[i].path[lstrlen(songs[i].path)] = '\0';
+			lstrcat(songs[i].path, TEXT("\r"));
+			lstrcat(songs[i].path, TEXT("\n"));
+			fwprintf(f, songs[i].path, MAX_PATH);
+		}
 	}
-	fout.close();
+	fclose(f);
 }
 /*
 	Load the playlist to file
-*/
+*/ 
 VOID DlgPlayList::LoadPlayList()
 {
-	std::ifstream fin("f.bin", std::ios::binary);
-	infoSong iS;
-	if (fin.is_open())
+	FILE* f;
+	TCHAR buff[MAX_PATH];
+	if (!_wfopen_s(&f, TEXT("PlayList.txt"), TEXT("rb, ccs=UTF-8")))
 	{
-		while(!fin.eof())
+		for (int i = 0; i < 11;i++)
 		{
-			infoSong iS;
-			fin.read((char*)&iS, sizeof(infoSong));
-			songs.push_back(iS);
-			addSongToPlayList(iS.hStream, iS.path);
+			fgetws(buff, MAX_PATH, f);
+			buff[lstrlen(buff) - 2] = '\0';
+			HSTREAM hStr = BASS_StreamCreateFile(0, buff, 0, 0, 0);
+			addSongToPlayList(hStr, buff);
 		}
-		fin.close();
 	}
+	fclose(f);
 }

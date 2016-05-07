@@ -58,18 +58,21 @@ VOID Application::CheckOpeningCopy(HWND hwnd)
 		EndDialog(hwnd, 0);
 	}
 }
+
 VOID Application::ColorFillSpectrum(INT r, INT g, INT b)
 {
 	fill_red = r;
 	fill_green = g;
 	fill_blue = b;
 }
+
 VOID Application::ColorContourSpectrum(INT r, INT g, INT b)
 {
 	contour_red = r;
 	contour_green = g;
 	contour_blue = b;
 }
+
 VOID Application::TransparencyWindow(HWND hWnd, INT value)
 {
 	// Set WS_EX_LAYERED on this window
@@ -167,9 +170,6 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		Create Equalizer
 	*/
 	equalizer.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGEQUALIZER), hwnd, equalizer.DlgProc);
-
-	HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAP1));
-	SendDlgItemMessage(hwnd, IDC_REPEATSONG, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
 	return TRUE;
 }
 /*
@@ -581,8 +581,7 @@ VOID Application::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, 
 */
 HBRUSH OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
-	//static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP1)));
-	static HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
+	static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP1)));
 	return brush;
 }
 /*
@@ -602,19 +601,7 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		case WM_CTLCOLORSTATIC:
 		{
 			HDC hDc = (HDC)wParam;
-			if (HWND(lParam) == GetDlgItem(hWnd, IDC_CHECKPLAYLIST))
-			{
-				SetBkMode(hDc, TRANSPARENT);
-				SetTextColor(hDc, RGB(255, 255, 255));
-				return (LRESULT)GetStockObject(NULL_BRUSH);
-			}
-			else if (HWND(lParam) == GetDlgItem(hWnd, IDC_CHECKEQUALIZER))
-			{
-				SetBkMode(hDc, TRANSPARENT);
-				SetTextColor(hDc, RGB(255, 255, 255));
-				return (LRESULT)GetStockObject(NULL_BRUSH);
-			}
-			else if (HWND(lParam) == _this->hTBSoundVolume)
+			if (HWND(lParam) == _this->hTBSoundVolume)
 			{
 				SetBkMode(hDc, TRANSPARENT);
 				return (LRESULT)GetStockObject(BLACK_BRUSH);
@@ -629,7 +616,9 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 				SetBkMode(hDc, TRANSPARENT);
 				return (LRESULT)GetStockObject(BLACK_BRUSH);
 			}
-			break;
+			SetBkMode(hDc, TRANSPARENT);
+			SetTextColor(hDc, RGB(255, 255, 255));
+			return (LRESULT)GetStockObject(NULL_BRUSH);
 		}
 		case WM_USER + 200:
 		{

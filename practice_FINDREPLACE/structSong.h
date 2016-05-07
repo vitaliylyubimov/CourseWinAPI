@@ -8,5 +8,5 @@ struct infoSong
 	CHAR year[10];			//год
 	INT minutes;			//Минут
 	INT seconds;			//Секунд
-	TCHAR path[200];			//путь к песне
+	TCHAR path[200];		//путь к песне
 };

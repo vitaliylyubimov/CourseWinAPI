@@ -100,8 +100,7 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="BMP\bckg.bmp" />
-    <Image Include="BMP\equalizerBckg.bmp" />
+    <Image Include="BMP\usia-planet-bumi-tinggal-1-75-miliar-tahun_40aac.bmp" />
     <Image Include="ICON\AudioPleer.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

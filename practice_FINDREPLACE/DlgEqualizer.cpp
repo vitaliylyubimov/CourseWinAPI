@@ -159,7 +159,6 @@ BOOL DlgEqualizer::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 HBRUSH OnColorDlg(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
 	static HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
-	//static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP2)));
 	return brush;
 }
 HBRUSH OnColorStatic(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
