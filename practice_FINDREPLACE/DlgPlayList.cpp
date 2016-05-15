@@ -351,18 +351,12 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 */
 VOID DlgPlayList::SavePlayList()
 {
-	/*FILE *f;
-	TCHAR buff[MAX_PATH];
-	if (!_wfopen_s(&f, TEXT("PlayList.txt"), TEXT("wb, ccs=UTF-8")))
-	{
-		for (int i = 0;i < songs.size();i++)
-		{
-			fwprintf(f, songs[i].path, MAX_PATH);
-			fwprintf(f, TEXT("\r\n"), 2);
-		}
-	}
-	fclose(f);*/
 	std::ofstream fout("Playlist.txt", std::ios::binary);
+	/*
+		Запись количества песен в плейлисте
+	*/
+	std::ofstream f("count_songs.txt");
+	f << songs.size();
 	for (int i = 0;i < songs.size();i++)
 		fout.write((char* )&songs[i], sizeof(infoSong));
 }
@@ -371,22 +365,18 @@ VOID DlgPlayList::SavePlayList()
 */ 
 VOID DlgPlayList::LoadPlayList()
 {
-	/*FILE* f;
-	TCHAR buff[MAX_PATH];
-	if (!_wfopen_s(&f, TEXT("PlayList.txt"), TEXT("rb, ccs=UTF-8")))
-	{
-		for (int i = 0; i < 11;i++)
-		{
-			fgetws(buff, MAX_PATH, f);
-			int a = 100;
-		}
-	}\
-	fclose(f);*/
+	/*
+		Clear playlist
+	*/
+	ListBox_ResetContent(hPlayList);
 	std::ifstream fin("Playlist.txt", std::ios::binary);
+	std::ifstream f("count_songs.txt");
+	int count;
+	f >> count;
 	infoSong iS;
 	if (fin.is_open())
 	{
-		for (int i = 0;i < 11;i++) {
+		for (int i = 0;i < count;i++) {
 			fin.read((char*)&iS, sizeof(infoSong));
 			HSTREAM stream = BASS_StreamCreateFile(0, iS.path, 0, 0, 0);
 			if (stream == 0)
