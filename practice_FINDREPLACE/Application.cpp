@@ -598,6 +598,9 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		HANDLE_MSG(hWnd, WM_COMMAND, _this->Cls_OnCommand);
 		HANDLE_MSG(hWnd, WM_SYSCOMMAND, _this->Cls_OnSysCommand);
 		HANDLE_MSG(hWnd, WM_RBUTTONDOWN, _this->Cls_OnRButtonDown);
+		/*
+			Set color statics
+		*/
 		case WM_CTLCOLORSTATIC:
 		{
 			HDC hDc = (HDC)wParam;
