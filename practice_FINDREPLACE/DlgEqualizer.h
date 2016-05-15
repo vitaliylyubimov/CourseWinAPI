@@ -14,7 +14,6 @@ public:
 
 	static INT_PTR WINAPI DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	VOID ShowEqualizer(INT isShow);
-	
 	VOID SetFX(HSTREAM stream);
 	VOID Cls_OnVScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos);
 	BOOL Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam);

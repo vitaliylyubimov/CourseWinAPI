@@ -1,5 +1,4 @@
 #define NAMEPLEER				TEXT("AudioPleer")
-
 #define THIS							11000
 #define IDC_BTNCLOSE					THIS + 1
 #define IDC_COLORTEXTRED				THIS + 2

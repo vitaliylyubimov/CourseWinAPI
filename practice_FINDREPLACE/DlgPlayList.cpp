@@ -349,39 +349,50 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 /*
 	Save the playlist to file 
 */
-TCHAR tmp[260];
 VOID DlgPlayList::SavePlayList()
 {
-	FILE *f;
+	/*FILE *f;
 	TCHAR buff[MAX_PATH];
 	if (!_wfopen_s(&f, TEXT("PlayList.txt"), TEXT("wb, ccs=UTF-8")))
 	{
 		for (int i = 0;i < songs.size();i++)
 		{
-			songs[i].path[lstrlen(songs[i].path)] = '\0';
-			lstrcat(songs[i].path, TEXT("\r"));
-			lstrcat(songs[i].path, TEXT("\n"));
 			fwprintf(f, songs[i].path, MAX_PATH);
+			fwprintf(f, TEXT("\r\n"), 2);
 		}
 	}
-	fclose(f);
+	fclose(f);*/
+	std::ofstream fout("Playlist.txt", std::ios::binary);
+	for (int i = 0;i < songs.size();i++)
+		fout.write((char* )&songs[i], sizeof(infoSong));
 }
 /*
 	Load the playlist to file
 */ 
 VOID DlgPlayList::LoadPlayList()
 {
-	FILE* f;
+	/*FILE* f;
 	TCHAR buff[MAX_PATH];
 	if (!_wfopen_s(&f, TEXT("PlayList.txt"), TEXT("rb, ccs=UTF-8")))
 	{
 		for (int i = 0; i < 11;i++)
 		{
 			fgetws(buff, MAX_PATH, f);
-			buff[lstrlen(buff) - 2] = '\0';
-			HSTREAM hStr = BASS_StreamCreateFile(0, buff, 0, 0, 0);
-			addSongToPlayList(hStr, buff);
+			int a = 100;
+		}
+	}\
+	fclose(f);*/
+	std::ifstream fin("Playlist.txt", std::ios::binary);
+	infoSong iS;
+	if (fin.is_open())
+	{
+		for (int i = 0;i < 11;i++) {
+			fin.read((char*)&iS, sizeof(infoSong));
+			HSTREAM stream = BASS_StreamCreateFile(0, iS.path, 0, 0, 0);
+			if (stream == 0)
+				addSongToPlayList(iS.hStream, iS.path);
+			else
+				addSongToPlayList(stream, iS.path);
 		}
 	}
-	fclose(f);
 }

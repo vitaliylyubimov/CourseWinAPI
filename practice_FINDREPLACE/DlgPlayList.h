@@ -17,6 +17,7 @@ public:
 	DlgPlayList();			//Contructor
 	~DlgPlayList();			//Destructor
 
+
 	static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);				//Procedure dlg
 	static INT_PTR CALLBACK ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);			//Procedure dlg by PlayList
 	VOID Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify);								//Processing WM_COMMAND

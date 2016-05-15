@@ -8,7 +8,7 @@ class Application
 private:
 	RECT spectrRECT;
 	HANDLE hMutex;
-	DlgPlayList dlg;								//Class object PlayList
+	DlgPlayList playlist;								//Class object PlayList
 	DlgEqualizer equalizer;							//Class object Equalizer
 	HWND hTBSoundVolume;							//TRackBar - volume 
 	HWND hTBPlayingSong;							//TRackBAr - current time songs

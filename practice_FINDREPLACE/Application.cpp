@@ -116,14 +116,14 @@ BOOL Application::openFile_LoadMusic(HWND hWnd)
 		{
 			hStream = BASS_StreamCreateFile(FALSE, path, 0, 0, 0);
 			setRangeTrackBarPlaySong(hStream);
-			dlg.addSongToPlayList(hStream, path);
+			playlist.addSongToPlayList(hStream, path);
 		}
 		else
 		{
 			HSTREAM stream;
 			stream = BASS_StreamCreateFile(FALSE, path, 0, 0, 0);
 			setRangeTrackBarPlaySong(stream);
-			dlg.addSongToPlayList(stream, path);
+			playlist.addSongToPlayList(stream, path);
 		}
 		return TRUE;
 	}
@@ -165,9 +165,9 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	/*
 		Create wnd playList
 	*/
-	dlg.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGPLAYLIST), hwnd, dlg.DlgProc);
+	playlist.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGPLAYLIST), hwnd, playlist.DlgProc);
 	/*
-		Create Equalizer
+		Create wnd Equalizer
 	*/
 	equalizer.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGEQUALIZER), hwnd, equalizer.DlgProc);
 	return TRUE;
@@ -220,7 +220,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 	{
 		case IDC_BTNPLAY:									//Play
 		{
-			if (hStream == NULL && dlg.songs.size() == 0)
+			if (hStream == NULL && playlist.songs.size() == 0)
 			{
 				BOOL isOpen = openFile_LoadMusic(hwnd);	
 				if (isOpen == TRUE)
@@ -230,9 +230,9 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 					SetTimer(hwnd, idTimerBySpectr, 100, 0);
 				}
 			}
-			else if (hStream == NULL && dlg.songs.size() > 0)
+			else if (hStream == NULL && playlist.songs.size() > 0)
 			{
-				hStream = dlg.songs[0].hStream;
+				hStream = playlist.songs[0].hStream;
 				play(hStream);
 				SetTimer(hwnd, id_timer, 1000, 0);
 				SetTimer(hwnd, idTimerBySpectr, 100, 0);
@@ -278,12 +278,12 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			if (isShow)
 			{
 				SendMessage(hCheckPlayList, BM_SETCHECK, BST_CHECKED, 0);
-				dlg.showPlayList(SW_SHOW);
+				playlist.showPlayList(SW_SHOW);
 			}
 			else
 			{
 				SendMessage(hCheckPlayList, BM_SETCHECK, BST_UNCHECKED, 0);
-				dlg.showPlayList(SW_HIDE);
+				playlist.showPlayList(SW_HIDE);
 			}
 
 			break;
@@ -464,7 +464,7 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 		QWORD len = BASS_ChannelGetLength(hStream, BASS_POS_BYTE);
 		INT seconds = BASS_ChannelBytes2Seconds(hStream, len);
 		SendMessage(hTBPlayingSong, TBM_SETPOS, TRUE, (LPARAM)secPlaying);
-		if (secPlaying == seconds && IsRepeatSong == FALSE && dlg.songs.size() > 1)
+		if (secPlaying == seconds && IsRepeatSong == FALSE && playlist.songs.size() > 1)
 		{
 			next();
 		}
@@ -473,7 +473,7 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 			secPlaying = 0;
 			play(hStream);
 		}
-		else if (dlg.songs.size() == 1 && secPlaying == seconds)
+		else if (playlist.songs.size() == 1 && secPlaying == seconds)
 		{
 			secPlaying = 0;
 			KillTimer(hwnd, id_timer);
@@ -753,14 +753,14 @@ VOID Application::pause()
 */
 VOID Application::prev()
 {
-	INT allSongs = dlg.songs.size();		//всего песен
+	INT allSongs = playlist.songs.size();		//всего песен
 	INT prev = 0;							//след играющая песня
 	if (allSongs > 0)
 	{
 		//Поиск текущей играемой песни
 		for (INT i = 0; i < allSongs; i++)
 		{
-			if (hStream == dlg.songs[i].hStream)
+			if (hStream == playlist.songs[i].hStream)
 			{
 				break;
 			}
@@ -772,7 +772,7 @@ VOID Application::prev()
 		else
 			prev--;
 		stop(hStream);				//остановка потока
-		hStream = dlg.songs[prev].hStream;		//загрузка следующей песни в поток
+		hStream = playlist.songs[prev].hStream;		//загрузка следующей песни в поток
 		secPlaying = 0;
 		setRangeTrackBarPlaySong(hStream);
 		equalizer.SetFX(hStream);
@@ -784,14 +784,14 @@ VOID Application::prev()
 */
 VOID Application::next()
 {
-	INT allSongs = dlg.songs.size();		//всего песен
+	INT allSongs = playlist.songs.size();		//всего песен
 	INT next = 0;						//след играющая песня
 	if (allSongs > 0)
 	{
 		//Поиск текущей играемой песни
 		for (INT i = 0; i < allSongs; i++)
 		{
-			if (hStream == dlg.songs[i].hStream)
+			if (hStream == playlist.songs[i].hStream)
 			{
 				next++;
 				break;
@@ -802,7 +802,7 @@ VOID Application::next()
 		if (next + 1 > allSongs)
 			next = 0;
 		stop(hStream);				//остановка потока
-		hStream = dlg.songs[next].hStream;		//загрузка следующей песни в поток
+		hStream = playlist.songs[next].hStream;		//загрузка следующей песни в поток
 		secPlaying = 0;
 		setRangeTrackBarPlaySong(hStream);		
 		equalizer.SetFX(hStream);

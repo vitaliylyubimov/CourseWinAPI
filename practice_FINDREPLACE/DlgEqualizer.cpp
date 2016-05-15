@@ -12,8 +12,7 @@ DlgEqualizer::DlgEqualizer()
 	Destructor
 */
 DlgEqualizer::~DlgEqualizer()
-{
-}
+{}
 /*
 	Show equalizer
 */

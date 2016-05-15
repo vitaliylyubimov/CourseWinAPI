@@ -1,4 +1,5 @@
 #include <Windows.h>
+
 struct infoSong
 {
 	HSTREAM hStream;		//HANDLE песни 
