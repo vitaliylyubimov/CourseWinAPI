@@ -66,5 +66,26 @@
     <Image Include="BMP\usia-planet-bumi-tinggal-1-75-miliar-tahun_40aac.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="BMP\repeat.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\norepeat.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\button_play.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\button_next.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\button_pause.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\button_prev.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\button_stop.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -100,6 +100,13 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="BMP\button_next.bmp" />
+    <Image Include="BMP\button_pause.bmp" />
+    <Image Include="BMP\button_play.bmp" />
+    <Image Include="BMP\button_prev.bmp" />
+    <Image Include="BMP\button_stop.bmp" />
+    <Image Include="BMP\norepeat.bmp" />
+    <Image Include="BMP\repeat.bmp" />
     <Image Include="BMP\usia-planet-bumi-tinggal-1-75-miliar-tahun_40aac.bmp" />
     <Image Include="ICON\AudioPleer.ico" />
   </ItemGroup>

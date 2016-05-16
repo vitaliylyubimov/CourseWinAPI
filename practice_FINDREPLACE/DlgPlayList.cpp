@@ -118,8 +118,6 @@ BOOL DlgPlayList::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	hPlayList = GetDlgItem(hwnd, IDC_PLAYLIST);
 	origProcContextMenu = (WNDPROC)SetWindowLong(hPlayList, GWL_WNDPROC, (LPARAM)ProcPlayList);
 	hContextMenu = CreatePopupMenu();
-	AppendMenu(hContextMenu, MF_STRING, IDC_BTNPLAY, TEXT("&Play"));
-	AppendMenu(hContextMenu, MF_SEPARATOR, 0, 0);
 	AppendMenu(hContextMenu, MF_STRING, IDC_DELETE, TEXT("&Delete"));
 	AppendMenu(hContextMenu, MF_STRING, IDC_CLEANPLAYLIST, TEXT("D&elete all"));
 	AppendMenu(hContextMenu, MF_SEPARATOR, 0, 0);
@@ -283,11 +281,6 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		{
 			switch (LOWORD(wParam))
 			{
-				case IDC_BTNPLAY:
-				{
-					SendMessage(GetParent(_this->hDlg), WM_COMMAND, IDC_BTNPLAY, 0);
-					break;
-				}
 				case IDC_DELETE:
 				{
 					int idxSel = ListBox_GetCurSel(_this->hPlayList);
@@ -352,11 +345,8 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 VOID DlgPlayList::SavePlayList()
 {
 	std::ofstream fout("Playlist.txt", std::ios::binary);
-	/*
-		Запись количества песен в плейлисте
-	*/
-	std::ofstream f("count_songs.txt");
-	f << songs.size();
+	//запись количества песен в плейлисте
+	fout << songs.size();
 	for (int i = 0;i < songs.size();i++)
 		fout.write((char* )&songs[i], sizeof(infoSong));
 }
@@ -370,19 +360,17 @@ VOID DlgPlayList::LoadPlayList()
 	*/
 	ListBox_ResetContent(hPlayList);
 	std::ifstream fin("Playlist.txt", std::ios::binary);
-	std::ifstream f("count_songs.txt");
 	int count;
-	f >> count;
+	fin >> count;
 	infoSong iS;
 	if (fin.is_open())
 	{
-		for (int i = 0;i < count;i++) {
+		for (int i = 0;i < count;i++) 
+		{
 			fin.read((char*)&iS, sizeof(infoSong));
-			HSTREAM stream = BASS_StreamCreateFile(0, iS.path, 0, 0, 0);
-			if (stream == 0)
-				addSongToPlayList(iS.hStream, iS.path);
-			else
-				addSongToPlayList(stream, iS.path);
+			//HSTREAM stream = BASS_StreamCreateFile(0, iS.path, 0, 0, 0);
+			//addSongToPlayList(iS.hStream, iS.path);
 		}
+
 	}
 }

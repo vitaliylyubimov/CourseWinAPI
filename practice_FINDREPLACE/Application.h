@@ -48,5 +48,6 @@ public:
 	VOID ColorFillSpectrum(INT r, INT g, INT b);
 	VOID ColorContourSpectrum(INT r, INT g, INT b);
 	VOID TransparencyWindow(HWND hWnd, INT value);
+	VOID showTimePlaying(HWND hWnd, INT secPlaying);
 	friend class DlgPlayList;
 };

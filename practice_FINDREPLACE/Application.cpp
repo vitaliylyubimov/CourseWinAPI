@@ -72,7 +72,9 @@ VOID Application::ColorContourSpectrum(INT r, INT g, INT b)
 	contour_green = g;
 	contour_blue = b;
 }
-
+/*
+	Прозрачность окна
+*/
 VOID Application::TransparencyWindow(HWND hWnd, INT value)
 {
 	// Set WS_EX_LAYERED on this window
@@ -82,14 +84,41 @@ VOID Application::TransparencyWindow(HWND hWnd, INT value)
 	SetLayeredWindowAttributes(hWnd, 0, (255 * value) / 100, LWA_ALPHA);
 }
 /*
-	Start programm
+	Вывод времени проигрывания
+*/
+VOID Application::showTimePlaying(HWND hWnd, INT secPlaying)
+{
+	INT sec, min;
+	min = secPlaying / 60;
+	sec = secPlaying % 60;
+	std::wstringstream ss;
+	if (min < 10 && sec < 10)
+	{
+		ss << "0" << min << ":0" << sec;
+	}
+	else if (min < 10 && sec >= 10)
+	{
+		ss << "0" << min << ":" << sec;
+	}
+	else if (min >= 10 && sec < 10)
+	{
+		ss << min << ":0" << sec;
+	}
+	else if (min >= 10 && sec >= 10)
+	{
+		ss << min << ":" << sec;
+	}
+	SetWindowText(GetDlgItem(hWnd, IDC_OUTTIME), ss.str().c_str());
+}
+/*
+	Запуск программы
 */
 INT Application::runProgramm()
 {
 	return DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), NULL, DlgProc);
 }
 /*
-	Load songs 
+	Загрузка песни с компьютера
 */
 BOOL Application::openFile_LoadMusic(HWND hWnd)
 {
@@ -108,10 +137,9 @@ BOOL Application::openFile_LoadMusic(HWND hWnd)
 	
 	ofn.nFilterIndex = 1;
 	ofn.nMaxFile = MAX_PATH;
-
+	
 	if (GetOpenFileName(&ofn))
 	{
-		
 		if (hStream == NULL)
 		{
 			hStream = BASS_StreamCreateFile(FALSE, path, 0, 0, 0);
@@ -170,6 +198,31 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		Create wnd Equalizer
 	*/
 	equalizer.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGEQUALIZER), hwnd, equalizer.DlgProc);
+	/*
+		Set time playing on static
+	*/
+	Static_SetText(GetDlgItem(hwnd, IDC_OUTTIME), TEXT("00:00"));
+	/*
+		Load images on buttons
+	*/
+	//Norepeat
+	HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPNOREPEAT));
+	SendMessage(GetDlgItem(hwnd, IDC_REPEATSONG), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+	//Prev
+	bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPPREV));
+	SendMessage(GetDlgItem(hwnd, IDC_PREVSONG), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+	//Pause
+	bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPPAUSE));
+	SendMessage(GetDlgItem(hwnd, IDC_BTNPAUSE), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+	//Play
+	bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPBTNPLAY));
+	SendMessage(GetDlgItem(hwnd, IDC_BTNPLAY), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+	//Stop
+	bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPSTOP));
+	SendMessage(GetDlgItem(hwnd, IDC_BTNSTOP), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+	//Next
+	bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPNEXT));
+	SendMessage(GetDlgItem(hwnd, IDC_NEXTSONG), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
 	return TRUE;
 }
 /*
@@ -331,11 +384,15 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			if (IsRepeatSong == FALSE)
 			{
 				SendDlgItemMessage(hwnd, IDC_REPEATSONG, WM_SETTEXT, 0, (LPARAM)TEXT("Yes"));
+				HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPREPEAT));
+				SendMessage(GetDlgItem(hwnd, IDC_REPEATSONG), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
 				IsRepeatSong = TRUE;
 			}
 			else
 			{
 				SendDlgItemMessage(hwnd, IDC_REPEATSONG, WM_SETTEXT, 0, (LPARAM)TEXT("No"));
+				HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPNOREPEAT));
+				SendMessage(GetDlgItem(hwnd, IDC_REPEATSONG), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
 				IsRepeatSong = FALSE;
 			}
 			break;
@@ -478,6 +535,7 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 			secPlaying = 0;
 			KillTimer(hwnd, id_timer);
 		}
+		showTimePlaying(hwnd, secPlaying);
 	}
 	else if (id == idTimerBySpectr)
 	{
@@ -619,9 +677,10 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 				SetBkMode(hDc, TRANSPARENT);
 				return (LRESULT)GetStockObject(BLACK_BRUSH);
 			}
+
 			SetBkMode(hDc, TRANSPARENT);
 			SetTextColor(hDc, RGB(255, 255, 255));
-			return (LRESULT)GetStockObject(NULL_BRUSH);
+			return (LRESULT)GetStockObject(BLACK_BRUSH);
 		}
 		case WM_USER + 200:
 		{
