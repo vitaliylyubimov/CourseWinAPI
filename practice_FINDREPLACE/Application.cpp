@@ -27,7 +27,7 @@ Application::~Application()
 	ReleaseMutex(hMutex);
 }
 /*
-	Check version BASS and initialization device 
+	Проверка версии BASS и инициализация устройства
 */
 INT Application::CheckedInitBASS()
 {
@@ -43,7 +43,7 @@ INT Application::CheckedInitBASS()
 	}
 }
 /*
-	Check opening coping application 
+	Проверка открытия повторных копий приложения 
 */
 VOID Application::CheckOpeningCopy(HWND hwnd)
 {
@@ -58,14 +58,18 @@ VOID Application::CheckOpeningCopy(HWND hwnd)
 		EndDialog(hwnd, 0);
 	}
 }
-
+/*
+	Цвет заливки спектра
+*/
 VOID Application::ColorFillSpectrum(INT r, INT g, INT b)
 {
 	fill_red = r;
 	fill_green = g;
 	fill_blue = b;
 }
-
+/*
+	Цвет контура спектра
+*/
 VOID Application::ColorContourSpectrum(INT r, INT g, INT b)
 {
 	contour_red = r;
@@ -79,7 +83,6 @@ VOID Application::TransparencyWindow(HWND hWnd, INT value)
 {
 	// Set WS_EX_LAYERED on this window
 	SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-
 	// Make this window 70% alpha
 	SetLayeredWindowAttributes(hWnd, 0, (255 * value) / 100, LWA_ALPHA);
 }
@@ -162,50 +165,47 @@ BOOL Application::openFile_LoadMusic(HWND hWnd)
 */
 BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
-	/*
-		Check the opening of the application copies
-	*/
 	CheckOpeningCopy(hwnd);
 	/*
-		Tittle dialog
+		Установка заголовка окна
 	*/
 	SetWindowText(hwnd, NAMEPLEER);
 	/*
-		Load icon
+		Загрузка иконки приложения
 	*/	
 	hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON1));
 	SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon);		
 	/*
-		Slider volume
+		Слайдер громкости
 	*/
 	hTBSoundVolume = GetDlgItem(hwnd, IDC_TRACKBARSOUND); 
 	SendMessage(hTBSoundVolume, TBM_SETPOS, TRUE, (LPARAM)100);
 	/*
-		Slider playing songs
+		Слайдер полосы перемотки 
 	*/
 	hTBPlayingSong = GetDlgItem(hwnd, IDC_SLIDER_TIMEPLAYING);
 	/*
-		Slider balance
+		Слайдер баланса
 	*/
 	hSlider_Balance = GetDlgItem(hwnd, IDC_SLIDERBALANCE);
 	SendMessage(hSlider_Balance, TBM_SETPOS, TRUE, (LPARAM)50);
 	SendMessage(hSlider_Balance, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(-5, 5));
 	/*
-		Create wnd playList
+		Создание окна плейлист
 	*/
 	playlist.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGPLAYLIST), hwnd, playlist.DlgProc);
 	/*
-		Create wnd Equalizer
+		Создание окна эквалайзер
 	*/
 	equalizer.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGEQUALIZER), hwnd, equalizer.DlgProc);
 	/*
-		Set time playing on static
+		Установка времени на статике
 	*/
 	Static_SetText(GetDlgItem(hwnd, IDC_OUTTIME), TEXT("00:00"));
 	/*
-		Load images on buttons
+		Загрузка изображений на элементы управления
 	*/
-	//Norepeat
+	//No repeat
 	HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPNOREPEAT));
 	SendMessage(GetDlgItem(hwnd, IDC_REPEATSONG), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
 	//Prev
@@ -231,7 +231,7 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 {
 	/*
-		Volume
+		Громкость
 	*/
 	if (hwndCtl == hTBSoundVolume)											//Adjusting the volume control (Настройка регулятора громкости)
 	{
@@ -243,9 +243,9 @@ VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 		
 	}
 	/*
-		Time playing
+		Время проигрывания
 	*/	
-	else if (hwndCtl == hTBPlayingSong)										//playing song position
+	else if (hwndCtl == hTBPlayingSong)										
 	{
 		INT nPos = 0;														//new position
 		nPos = SendMessage(hTBPlayingSong, TBM_GETPOS, 0, 0);				//Get new position
@@ -255,7 +255,7 @@ VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 		SendMessage(hTBPlayingSong, TBM_SETPOS, TRUE, (LPARAM)nPos);		//Translated position	
 	}
 	/*
-		Balance
+		Баланс
 	*/
 	else if (hwndCtl == hSlider_Balance)
 	{
@@ -271,7 +271,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 	static BOOL IsStop = FALSE;				//был ли нажат Stop
 	switch (id)
 	{
-		case IDC_BTNPLAY:									//Play
+		case IDC_BTNPLAY:									
 		{
 			if (hStream == NULL && playlist.songs.size() == 0)
 			{
@@ -519,20 +519,27 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 	{
 		secPlaying++;
 		QWORD len = BASS_ChannelGetLength(hStream, BASS_POS_BYTE);
-		INT seconds = BASS_ChannelBytes2Seconds(hStream, len);
+		INT seconds = BASS_ChannelBytes2Seconds(hStream, len) + 1;
 		SendMessage(hTBPlayingSong, TBM_SETPOS, TRUE, (LPARAM)secPlaying);
+		INT pos = SendMessage(hTBPlayingSong, TBM_GETPOS, 0, 0);
 		if (secPlaying == seconds && IsRepeatSong == FALSE && playlist.songs.size() > 1)
 		{
 			next();
 		}
 		else if (IsRepeatSong == TRUE && secPlaying == seconds)
 		{
+			SendMessage(hTBPlayingSong, TBM_SETPOS, TRUE, (LPARAM)0);
 			secPlaying = 0;
 			play(hStream);
 		}
 		else if (playlist.songs.size() == 1 && secPlaying == seconds)
 		{
 			secPlaying = 0;
+			KillTimer(hwnd, id_timer);
+		}else if (pos == seconds)
+		{
+			secPlaying = 0;
+			stop(hStream);
 			KillTimer(hwnd, id_timer);
 		}
 		showTimePlaying(hwnd, secPlaying);
@@ -632,14 +639,13 @@ VOID Application::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, 
 	POINT p;
 	GetCursorPos(&p);
 	TrackPopupMenu(hContextMenu, TPM_LEFTALIGN, p.x, p.y, 0, hwnd, 0);
-
 }
 /*
 	Fnct loading bckg
 */
 HBRUSH OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
-	static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP1)));
+	static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAPBCKG)));
 	return brush;
 }
 /*
@@ -662,7 +668,7 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		case WM_CTLCOLORSTATIC:
 		{
 			HDC hDc = (HDC)wParam;
-			if (HWND(lParam) == _this->hTBSoundVolume)
+			/*if (HWND(lParam) == _this->hTBSoundVolume)
 			{
 				SetBkMode(hDc, TRANSPARENT);
 				return (LRESULT)GetStockObject(BLACK_BRUSH);
@@ -677,7 +683,7 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 				SetBkMode(hDc, TRANSPARENT);
 				return (LRESULT)GetStockObject(BLACK_BRUSH);
 			}
-
+			*/
 			SetBkMode(hDc, TRANSPARENT);
 			SetTextColor(hDc, RGB(255, 255, 255));
 			return (LRESULT)GetStockObject(BLACK_BRUSH);
@@ -839,6 +845,7 @@ VOID Application::prev()
 		setRangeTrackBarPlaySong(hStream);
 		equalizer.SetFX(hStream);
 		play(hStream);				//воспроизвести поток
+		SetTimer(GetParent(hTBPlayingSong), id_timer, 1000, 0);
 	}
 }
 /*
@@ -863,12 +870,13 @@ VOID Application::next()
 		//Если при нажатии на NextSong достигнут конец списка, перевести указатель на начало списка
 		if (next + 1 > allSongs)
 			next = 0;
-		stop(hStream);				//остановка потока
+		stop(hStream);								//остановка потока
 		hStream = playlist.songs[next].hStream;		//загрузка следующей песни в поток
-		secPlaying = 0;
-		setRangeTrackBarPlaySong(hStream);		
-		equalizer.SetFX(hStream);
-		play(hStream);				//воспроизвести поток
+		secPlaying = 0;								//сброс проигранных секунд
+		setRangeTrackBarPlaySong(hStream);			//установка диапазона TrackBar под играющую песню 
+		equalizer.SetFX(hStream);					
+		play(hStream);								//воспроизвести поток
+		SetTimer(GetParent(hTBPlayingSong), id_timer, 1000, 0);	//Запуск таймера 
 	}
 }
 /*

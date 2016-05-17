@@ -27,7 +27,7 @@ public:
 	VOID addSongToPlayList(HSTREAM stream, TCHAR*path);													//Add song by PlayList
 	VOID showPlayList(INT isShow);																		//Show PlayList
 	VOID changeColorTextInPlayList(HWND hWnd, INT r, INT g, INT b);										//Chahbe color text			
-	HBRUSH OnListColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type);									//Color Background and color text in PlayList
+	HBRUSH OnListColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type);
 	VOID SavePlayList();
 	VOID LoadPlayList();
 	friend class Application;
