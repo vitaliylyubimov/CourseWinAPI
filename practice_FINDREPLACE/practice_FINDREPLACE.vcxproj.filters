@@ -63,9 +63,6 @@
     <Image Include="ICON\AudioPleer.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="BMP\usia-planet-bumi-tinggal-1-75-miliar-tahun_40aac.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="BMP\repeat.bmp">
       <Filter>Resource Files</Filter>
     </Image>
@@ -85,6 +82,15 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="BMP\button_stop.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\bckg2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\192179__square-section-highlighting_p.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMP\border palylist.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
