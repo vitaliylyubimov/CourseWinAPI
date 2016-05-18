@@ -129,6 +129,8 @@ BOOL DlgPlayList::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	AppendMenu(hColor, MF_STRING, IDC_COLORWHITE, TEXT("&White"));
 	AppendMenu(hColor, MF_STRING, IDC_COLORYELLOW, TEXT("&Yellow"));
 	AppendMenu(hColor, MF_STRING, IDC_COLORTURQUOISE, TEXT("&Turquoise"));
+	HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPSAVE));
+	SendMessage(GetDlgItem(hwnd, IDC_SAVEPLAYLIST), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
 	return TRUE;
 }
 /*

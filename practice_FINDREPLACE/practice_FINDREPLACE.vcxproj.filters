@@ -93,5 +93,8 @@
     <Image Include="BMP\border palylist.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="BMP\Save.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

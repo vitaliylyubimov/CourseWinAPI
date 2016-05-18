@@ -110,6 +110,7 @@
     <Image Include="BMP\button_stop.bmp" />
     <Image Include="BMP\norepeat.bmp" />
     <Image Include="BMP\repeat.bmp" />
+    <Image Include="BMP\Save.bmp" />
     <Image Include="ICON\AudioPleer.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
