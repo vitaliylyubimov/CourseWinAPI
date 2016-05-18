@@ -17,11 +17,9 @@ DlgPlayList::DlgPlayList()
 /*
 	Destructor
 */
-DlgPlayList::~DlgPlayList()
-{
-}
+DlgPlayList::~DlgPlayList(){}
 /*
-	Colors in PlayList
+	Установка цвета фона плейлисте
 */
 HBRUSH DlgPlayList::OnListColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
@@ -31,7 +29,7 @@ HBRUSH DlgPlayList::OnListColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 	return brush;
 }
 /*
-	Procedure dlg
+	Диалоговая процедура
 */
 INT_PTR CALLBACK DlgPlayList::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -67,7 +65,7 @@ INT_PTR CALLBACK DlgPlayList::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	return FALSE;
 }
 /*
-	Processing WM_COMMAND
+	WM_COMMAND
 */
 VOID DlgPlayList::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify)
 {
@@ -98,12 +96,12 @@ VOID DlgPlayList::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 		}
 		case IDC_SAVEPLAYLIST:
 		{
-			SavePlayList();
+			//SavePlayList();
 			break;
 		}
 		case IDC_LOADPLAYLIST:
 		{
-			LoadPlayList();
+			//LoadPlayList();
 			break;
 		}
 		default:
@@ -111,12 +109,19 @@ VOID DlgPlayList::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 	}
 }
 /*
-	Processing WM_INITDIALOG
+	WM_INITDIALOG
 */
 BOOL DlgPlayList::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
+	//получение дескриптора плейлиста
 	hPlayList = GetDlgItem(hwnd, IDC_PLAYLIST);
+	/*
+		Подвязка процедуры для обработки сообщений в ListBox плейлиста
+	*/
 	origProcContextMenu = (WNDPROC)SetWindowLong(hPlayList, GWL_WNDPROC, (LPARAM)ProcPlayList);
+	/*
+		Создание контекстного меню
+	*/
 	hContextMenu = CreatePopupMenu();
 	AppendMenu(hContextMenu, MF_STRING, IDC_DELETE, TEXT("&Delete"));
 	AppendMenu(hContextMenu, MF_STRING, IDC_CLEANPLAYLIST, TEXT("D&elete all"));
@@ -129,26 +134,27 @@ BOOL DlgPlayList::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	AppendMenu(hColor, MF_STRING, IDC_COLORWHITE, TEXT("&White"));
 	AppendMenu(hColor, MF_STRING, IDC_COLORYELLOW, TEXT("&Yellow"));
 	AppendMenu(hColor, MF_STRING, IDC_COLORTURQUOISE, TEXT("&Turquoise"));
+	/*
+		Загрузка изображения на кнопку
+	*/
 	HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPSAVE));
 	SendMessage(GetDlgItem(hwnd, IDC_SAVEPLAYLIST), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
 	return TRUE;
 }
 /*
-	Show PlayList
+	Отображение плейлиста
 */
 VOID DlgPlayList::showPlayList(INT isShow)
 {	
-	RECT r;						//PlayList
-	RECT wnd;					//Pleer
-	GetWindowRect(GetParent(hDlg), &wnd);
-	GetWindowRect(hDlg, &r);
-	SetWindowPos(hDlg, 0, wnd.left + 3, wnd.bottom - 3, r.right, r.bottom, SWP_NOSIZE);
-	
-	ShowWindow(hDlg, isShow);
-	SetForegroundWindow(hDlg);
+	RECT r;						//Плейлист
+	RECT wnd;					//Плеер
+	GetWindowRect(GetParent(hDlg), &wnd);		//получение размера окна приложения
+	GetWindowRect(hDlg, &r);					//получение размера плейлиста
+	SetWindowPos(hDlg, 0, wnd.left + 3, wnd.bottom - 3, r.right, r.bottom, SWP_NOSIZE);			//перемещение окна	
+	ShowWindow(hDlg, isShow);		//отображение окна
 }
 /*
-	Add song in PlayList
+	Добавление песни в плейлист
 */
 VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR* path)
 {
@@ -158,9 +164,9 @@ VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR* path)
 	QWORD lengthSong = BASS_ChannelGetLength(stream, BASS_POS_BYTE);		//длина песни в байтах
 	INT seconds = BASS_ChannelBytes2Seconds(stream, lengthSong);			//длина песни в секундах
 	INT min = seconds / 60;													//Определение минут
-	seconds = seconds % 60;	//Определение секунд
+	seconds = seconds % 60;							//Определение секунд
 	/*
-		Fiiling data of the songs
+		Заполнение данных о песне
 	*/
 	if (id3 == NULL || strlen(id3->artist) == 0)
 	{
@@ -177,7 +183,7 @@ VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR* path)
 			name[k] = path[i];
 			k++;
 		}
-		name[k - 4] = '\0';			//Delete format songs
+		name[k - 4] = '\0';					//Удаление формата песни
 		infoAboutTheSong << name << "               ";
 	}
 	else
@@ -194,7 +200,7 @@ VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR* path)
 	info.hStream = stream;													//Stream
 	lstrcpy(info.path, path);												//Path of the song
 	/*
-		Write time in string
+		Запись времени песни в строку
 	*/
 	infoAboutTheSong << info.minutes << ":";
 	if (seconds < 10)
@@ -205,23 +211,26 @@ VOID DlgPlayList::addSongToPlayList(HSTREAM stream, TCHAR* path)
 	songs.push_back(info);													//Add in vector
 }
 /*
-	ContextMenu by PlayList
+	Контекстное меню для плейлиста
 */
 VOID DlgPlayList::Cls_OnContextMenu(HWND hwnd, HWND hwndContext, UINT xPos, UINT yPos)
 {
 	POINT pos;
 	GetCursorPos(&pos);
 	INT idx = SendMessage(hPlayList, LB_GETCURSEL, 0, 0);
+	/*
+		Отображение меню только в том случае если есть песни в плейлисте и если песня выделена
+	*/
 	if (idx >= 0)
 		TrackPopupMenu(_this->hContextMenu, TPM_BOTTOMALIGN, pos.x, pos.y, 0, hwndContext, 0);
 }
 /*
-	Me fnct is to compare char strings (strcmp not work :( )
+	Собственная функция сравнения строк
 */
 BOOL me_strcmp(CHAR *str1, CHAR* str2)
 {
-	INT len = strlen(str1);				//Length string
-	INT count = 0;						//Count of matched symbols (Количество совпавших символов)
+	INT len = strlen(str1);				//Длина строки
+	INT count = 0;						//Количество совпавших символов
 	for (INT i = 0; i < len; i++)
 	{
 		if (str1[i] == str2[i])
@@ -232,20 +241,20 @@ BOOL me_strcmp(CHAR *str1, CHAR* str2)
 	return FALSE;
 }
 /*
-	Thread by load music in PlayList
+	Поток для загрузки музыки в плейлист
 */
 DWORD WINAPI Thread(LPVOID lp)
 {
 	HDROP hDrop = (HDROP)lp;
 	CHAR szFileName[MAX_PATH];
 	TCHAR buff[MAX_PATH];
-	DWORD dwCount = DragQueryFileA(hDrop, 0xFFFFFFFF, szFileName, MAX_PATH);
+	DWORD dwCount = DragQueryFileA(hDrop, 0xFFFFFFFF, szFileName, MAX_PATH);		//Определение количества загружаемых песен
 	for (INT i = 0; i < dwCount; i++)
 	{
-		DragQueryFileA(hDrop, i, szFileName, MAX_PATH);			//definition path to file
+		DragQueryFileA(hDrop, i, szFileName, MAX_PATH);			//Определение пути к файлу
 		INT len = strlen(szFileName);
-		CHAR buffFormat[4];								//buff format songs
-		INT j = 0;										//by buff format
+		CHAR buffFormat[4];									//Формат песни
+		INT j = 0;											//для прохода по буферу формата песни
 		for (INT i = len - 4; i < len; i++)
 		{
 			buffFormat[j] = szFileName[i];
@@ -253,16 +262,16 @@ DWORD WINAPI Thread(LPVOID lp)
 		}
 		if (me_strcmp(".mp3", buffFormat))
 		{
-			HSTREAM stream = BASS_StreamCreateFile(0, szFileName, 0, 0, 0);			//Create handle 
-			mbstowcs(buff, szFileName, MAX_PATH);					//CHAR to TCHAR
-			DlgPlayList::_this->addSongToPlayList(stream, buff);			//Add songs to playlist
+			HSTREAM stream = BASS_StreamCreateFile(0, szFileName, 0, 0, 0);			//Создание потока 
+			mbstowcs(buff, szFileName, MAX_PATH);							//преобразование CHAR to TCHAR
+			DlgPlayList::_this->addSongToPlayList(stream, buff);			//Добавление песни в плейлист
 		}
 	}
 	DragFinish(hDrop);
 	return FALSE;
 }
 /*
-	Change color text in PlayList
+	Изменение цвета текста в плейлисте
 */
 VOID DlgPlayList::changeColorTextInPlayList(HWND hWnd, INT r, INT g, INT b)
 {
@@ -272,10 +281,23 @@ VOID DlgPlayList::changeColorTextInPlayList(HWND hWnd, INT r, INT g, INT b)
 	InvalidateRect(hWnd, NULL, TRUE);
 }
 /*
-	Procedure dlg by PlayList
+	Скрытие всех галочек в контекстном меню выбора цвета
+*/
+VOID DlgPlayList::UncheckedAllItemContextMenu(HMENU hMenu)
+{
+	CheckMenuItem(hMenu, IDC_COLORTEXTRED, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hMenu, IDC_COLORTEXTBLUE, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hMenu, IDC_COLORTEXTGREEN, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hMenu, IDC_COLORTURQUOISE, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hMenu, IDC_COLORWHITE, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hMenu, IDC_COLORYELLOW, MF_BYCOMMAND | MF_UNCHECKED);
+}
+/*
+	Диалоговая процедура
 */
 INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static HMENU hColorText = GetSubMenu(_this->hContextMenu, 3);
 	switch (uMsg)
 	{
 		HANDLE_MSG(hWnd, WM_CONTEXTMENU, _this->Cls_OnContextMenu);
@@ -298,31 +320,43 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 				}
 				case IDC_COLORTEXTRED:
 				{
+					_this->UncheckedAllItemContextMenu(hColorText);
+					CheckMenuItem(hColorText, IDC_COLORTEXTRED, MF_BYCOMMAND | MF_CHECKED);
 					_this->changeColorTextInPlayList(hWnd, 255, 0, 0);
 					break;
 				}
 				case IDC_COLORTEXTGREEN:
 				{
+					_this->UncheckedAllItemContextMenu(hColorText);
+					CheckMenuItem(hColorText, IDC_COLORTEXTGREEN, MF_BYCOMMAND | MF_CHECKED);
 					_this->changeColorTextInPlayList(hWnd, 0, 255, 0);
 					break;
 				}
 				case IDC_COLORTEXTBLUE:
 				{
+					_this->UncheckedAllItemContextMenu(hColorText);
+					CheckMenuItem(hColorText, IDC_COLORTEXTBLUE, MF_BYCOMMAND | MF_CHECKED);
 					_this->changeColorTextInPlayList(hWnd, 0, 0, 255);
 					break;
 				}
 				case IDC_COLORWHITE:
 				{
+					_this->UncheckedAllItemContextMenu(hColorText);
+					CheckMenuItem(hColorText, IDC_COLORWHITE, MF_BYCOMMAND | MF_CHECKED);
 					_this->changeColorTextInPlayList(hWnd, 255, 255, 255);
 					break;
 				}
 				case IDC_COLORYELLOW:
 				{
+					_this->UncheckedAllItemContextMenu(hColorText);
+					CheckMenuItem(hColorText, IDC_COLORYELLOW, MF_BYCOMMAND | MF_CHECKED);
 					_this->changeColorTextInPlayList(hWnd, 255, 255, 0);
 					break;
 				}
 				case IDC_COLORTURQUOISE:
 				{
+					_this->UncheckedAllItemContextMenu(hColorText);
+					CheckMenuItem(hColorText, IDC_COLORTURQUOISE, MF_BYCOMMAND | MF_CHECKED);
 					_this->changeColorTextInPlayList(hWnd, 0, 245, 255);
 					break;
 				}
@@ -330,12 +364,12 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			break;
 		}
 		/*
-			Processing WM_DROPFILES
+			WM_DROPFILES
 		*/
 		case WM_DROPFILES:
 		{
 			HDROP hDrop = (HDROP)wParam;
-			HANDLE hThread = CreateThread(0, 0, Thread, hDrop, 0, 0);			//Запуск отдельного потока для загрузки музыки в PlayList
+			HANDLE hThread = CreateThread(0, 0, Thread, hDrop, 0, 0);			//Создание отдельного потока для загрузки музыки в PlayList
 			break;
 		}
 	}
@@ -346,11 +380,16 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 */
 VOID DlgPlayList::SavePlayList()
 {
-	std::ofstream fout("Playlist.txt", std::ios::binary);
-	//запись количества песен в плейлисте
-	fout << songs.size();
-	for (int i = 0;i < songs.size();i++)
-		fout.write((char* )&songs[i], sizeof(infoSong));
+	if (songs.size() != 0)
+	{
+		std::ofstream fout("Playlist.txt", std::ios::binary);
+		//запись количества песен в плейлисте
+		fout << songs.size();
+		for (int i = 0;i < songs.size();i++)
+			fout.write((char*)&songs[i], sizeof(infoSong));
+
+		fout.close();
+	}
 }
 /*
 	Load the playlist to file
@@ -370,9 +409,16 @@ VOID DlgPlayList::LoadPlayList()
 		for (int i = 0;i < count;i++) 
 		{
 			fin.read((char*)&iS, sizeof(infoSong));
-			//HSTREAM stream = BASS_StreamCreateFile(0, iS.path, 0, 0, 0);
-			//addSongToPlayList(iS.hStream, iS.path);
+			HSTREAM stream = BASS_StreamCreateFile(0, iS.path, 0, 0, 0);
+			if (stream == 0)
+			{
+				addSongToPlayList(iS.hStream, iS.path);
+			}
+			else {
+				iS.hStream = stream;
+				addSongToPlayList(iS.hStream, iS.path);
+			}
 		}
-
+		fin.close();
 	}
 }

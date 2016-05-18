@@ -6,8 +6,8 @@
 class Application
 {
 private:
-	RECT spectrRECT;
-	HANDLE hMutex;
+	RECT spectrRECT;								//Размер спектра
+	HANDLE hMutex;									//Мютекс для проверки повторного открытия окна
 	DlgPlayList playlist;							//Объект класса PlayList
 	DlgEqualizer equalizer;							//Объект класса Equalizer
 	HWND hTBSoundVolume;							//Slider - громкость 
@@ -21,6 +21,14 @@ private:
 	HSTREAM hStream;								//Поток воспроизведения песни
 	INT contour_red, contour_green, contour_blue;	//RGB смешивание контура
 	INT fill_red, fill_green, fill_blue;			//RGB смешивание заливки
+	/*
+		Контекстное меню
+	*/
+	HMENU hContextMenu = CreatePopupMenu();
+	HMENU hColor = CreatePopupMenu();
+	HMENU hColorContour = CreatePopupMenu();
+	HMENU hColorFill = CreatePopupMenu();
+	HMENU hTranperency = CreatePopupMenu();
 public:
 	Application(VOID);								//конструктор по умолчанию
 	~Application();									//деструктор
@@ -33,6 +41,8 @@ public:
 	VOID Cls_OnTimer(HWND hwnd, UINT id);																//WM_TIMER
 	VOID Cls_OnSysCommand(HWND hwnd, UINT cmd, INT x, INT y);											//WM_SYSCOMMAND
 	VOID Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlags);					//WM_RBUTTONDOWN
+	HBRUSH OnColorStatic(HWND hwnd, HDC hdc, HWND hwndChild, INT type);							//Отображение статика
+	HBRUSH OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type);							//Отображение фона окна
 	INT runProgramm();												//старт программы
 	INT CheckedInitBASS();											//проверка инициализации BASS
 	BOOL openFile_LoadMusic(HWND hWnd);								//открытие песни с компьютера OPENFILENAME
@@ -49,5 +59,9 @@ public:
 	VOID ColorContourSpectrum(INT r, INT g, INT b);					//Цвет контура заливки
 	VOID TransparencyWindow(HWND hWnd, INT value);					//Прозрачность окна
 	VOID showTimePlaying(HWND hWnd, INT secPlaying);				//Время играющей песни
+	VOID showNameSong(HSTREAM stream, HWND hWnd);
+	VOID UncheckedAllMenuItemContour();								//Снятие всех галочек с элементов меню Контура
+	VOID UncheckedAllMenuItemFill();								//Снятие всех галочек с элементов меню Заливки
+	VOID UncheckedAllMenuItemTransperency();						//Снятие всех галочек с элементов меню Прозрачности
 	friend class DlgPlayList;
 };

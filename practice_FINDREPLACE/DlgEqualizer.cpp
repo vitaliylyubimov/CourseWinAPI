@@ -2,32 +2,30 @@
 #include "Application.h"
 DlgEqualizer* DlgEqualizer::_this = NULL;
 /*
-	Constructor
+	Конструктор
 */
 DlgEqualizer::DlgEqualizer()
 {
 	_this = this;
 }
 /*
-	Destructor
+	Деструктор
 */
-DlgEqualizer::~DlgEqualizer()
-{}
+DlgEqualizer::~DlgEqualizer(){}
 /*
-	Show equalizer
+	Отображение эквалайзера
 */
 VOID DlgEqualizer::ShowEqualizer(INT isShow)
 {
-	RECT child;						//Equalizer
-	RECT parent;					//Pleer
-	GetWindowRect(GetParent(hDlg), &parent);
-	GetWindowRect(hDlg, &child);
+	RECT child;						//Эквалайзер
+	RECT parent;					//Плеер
+	GetWindowRect(GetParent(hDlg), &parent);	//получение размера основного окна приложения
+	GetWindowRect(hDlg, &child);				//получение размера окна эквалайзера
 	SetWindowPos(hDlg, 0, parent.left + 3, parent.bottom - 3, child.right, child.bottom, SWP_NOSIZE);
 	ShowWindow(hDlg, isShow);
-	//SetForegroundWindow(hDlg);
 }
 /*
-	Processing WM_VSCROLL
+	WM_VSCROLL
 */
 VOID DlgEqualizer::Cls_OnVScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 {
@@ -113,12 +111,12 @@ VOID DlgEqualizer::Cls_OnVScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 	}
 }
 /*
-	Set FX by channel
+	установка FX для канала
 */
 VOID DlgEqualizer::SetFX(HSTREAM stream)
 {
 	/*
-		Set FX by device
+		Установка FX для устройства
 	*/
 	for (int i = 0;i < 10;i++)
 	{
@@ -131,7 +129,7 @@ VOID DlgEqualizer::SetFX(HSTREAM stream)
 BOOL DlgEqualizer::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
 	/*
-		Get handle
+		Получение дескрипторов
 	*/
 	hSlidersEqualizer[0] = GetDlgItem(hwnd, IDC_SLIDER_EQUALIZER1);
 	hSlidersEqualizer[1] = GetDlgItem(hwnd, IDC_SLIDER_EQUALIZER2);
@@ -144,7 +142,7 @@ BOOL DlgEqualizer::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	hSlidersEqualizer[8] = GetDlgItem(hwnd, IDC_SLIDER_EQUALIZER9);
 	hSlidersEqualizer[9] = GetDlgItem(hwnd, IDC_SLIDER_EQUALIZER10);
 	/*
-		Set range and positions by equalizer
+		установка диапазона слайдеров и позиции
 	*/
 	for (int i = 0; i < 10;i++)
 	{
@@ -153,33 +151,34 @@ BOOL DlgEqualizer::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	return TRUE;
 }
 /*
-	Processing WM_CTLCOLORDLG
+	WM_CTLCOLORDLG
 */
 HBRUSH OnColorDlg(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
-	static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPEQUAlIZER)));
+	//static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPEQUAlIZER)));
+	static HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	return brush;
 }
+/*
+	Отображение статика
+*/
 HBRUSH OnColorStatic(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
 	SetBkMode(hdc, TRANSPARENT);
-	SetTextColor(hdc, RGB(0, 245, 255));
+	SetTextColor(hdc, RGB(255, 255, 255));
 	return (HBRUSH)GetStockObject(BLACK_BRUSH);
 }
 /*
-	Dlg procedure
+	Диалоговая процедура
 */
 INT_PTR WINAPI DlgEqualizer::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-		HANDLE_MSG(hWnd, WM_CTLCOLORDLG, OnColorDlg);					//Processing WM_CTLCOLORDLG
-		HANDLE_MSG(hWnd, WM_CTLCOLORSTATIC, OnColorStatic);				//Processing WM_CTLCOLORSTATIC
-		HANDLE_MSG(hWnd, WM_INITDIALOG, _this->Cls_OnInitDialog);		//Processing WM_INITDIALOG
-		HANDLE_MSG(hWnd, WM_VSCROLL, _this->Cls_OnVScroll);				//Processing WM_VSCROLL
-		/*
-			Processing WM_LBUTTONDOWN
-		*/
+		HANDLE_MSG(hWnd, WM_CTLCOLORDLG, OnColorDlg);					
+		HANDLE_MSG(hWnd, WM_CTLCOLORSTATIC, OnColorStatic);				
+		HANDLE_MSG(hWnd, WM_INITDIALOG, _this->Cls_OnInitDialog);		
+		HANDLE_MSG(hWnd, WM_VSCROLL, _this->Cls_OnVScroll);				
 		case WM_LBUTTONDOWN:
 		{
 			RECT wnd;
@@ -191,35 +190,6 @@ INT_PTR WINAPI DlgEqualizer::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 			{
 				SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);
 			}
-			break;
-		}
-		/*
-			Processing WM_PAINT
-		*/
-		case WM_PAINT:
-		{
-			/*PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hWnd, &ps);
-			RECT wnd;
-			HFONT hFont;
-			GetClientRect(hWnd, &wnd);	*/
-			/*
-				Create the font by text
-			*/
-			//hFont = CreateFont(16, 0, 0, 0, FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, TEXT("Times New Roman Cyr"));
-			/*
-				Settings text
-			*/
-			/*SelectObject(hdc, hFont);
-			SetTextColor(hdc, RGB(255, 255, 255));
-			SetBkMode(hdc, TRANSPARENT);*/
-			/*
-				Output text
-			*/
-			//TextOut(hdc, 40, 50, TEXT("Balance"), 7);
-			/*
-			EndPaint(hWnd, &ps);
-			ReleaseDC(hWnd, hdc);*/
 			break;
 		}
 		case WM_CLOSE:

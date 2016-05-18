@@ -6,4 +6,3 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpczCmd, int nSho
 	Application app;
 	return app.runProgramm();
 }
-

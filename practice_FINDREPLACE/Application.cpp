@@ -16,8 +16,6 @@ Application::Application(VOID)
 	id_timer = 0;						//ID timer by PlayingSongs
 	idTimerBySpectr = 1;				//ID timer by Spectrum
 	IsRepeatSong = FALSE;				//повтор песни
-	contour_red = contour_green = contour_blue = 255;
-	fill_red = fill_green = fill_blue = 0;
 }
 /*
 	Destructor
@@ -165,7 +163,7 @@ BOOL Application::openFile_LoadMusic(HWND hWnd)
 */
 BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
-	CheckOpeningCopy(hwnd);
+	CheckOpeningCopy(hwnd);				//запуск проверки на открытие копий
 	/*
 		Установка заголовка окна
 	*/
@@ -223,6 +221,53 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	//Next
 	bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPNEXT));
 	SendMessage(GetDlgItem(hwnd, IDC_NEXTSONG), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+	/*
+		Создание контекстного меню
+	*/
+	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hColor, TEXT("Color spectrum"));
+
+	AppendMenu(hColor, MF_STRING | MF_POPUP, (INT_PTR)hColorContour, TEXT("Color contour"));
+	AppendMenu(hColor, MF_STRING | MF_POPUP, (INT_PTR)hColorFill, TEXT("Color fill"));
+
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_RED, TEXT("Red"));
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_GREEN, TEXT("Green"));
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_BLUE, TEXT("Blue"));
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_WHITE, TEXT("White"));
+	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_BLACK, TEXT("Black"));
+
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_RED, TEXT("Red"));
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_GREEN, TEXT("Green"));
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_BLUE, TEXT("Blue"));
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_WHITE, TEXT("White"));
+	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_BLACK, TEXT("Black"));
+
+	/*
+		Transperency
+	*/
+	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hTranperency, TEXT("Transparency window"));
+
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_100, TEXT("100%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_90, TEXT("90%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_80, TEXT("80%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_70, TEXT("70%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_60, TEXT("60%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_50, TEXT("50%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_40, TEXT("40%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_30, TEXT("30%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_20, TEXT("20%"));
+	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_10, TEXT("10%"));
+	/*
+		Инициализация цветов спектра
+	*/
+	contour_red = contour_green = contour_blue = 0;
+	fill_red = 255;
+	fill_green = fill_blue = 0;
+	/*
+		Установка галочек в меню и цвет спектра
+	*/
+	CheckMenuItem(hColorContour, COLOR_CONTOUR_BLACK, MF_BYCOMMAND | MF_CHECKED);
+	CheckMenuItem(hColorFill, COLOR_FILL_RED, MF_BYCOMMAND | MF_CHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_100, MF_BYCOMMAND | MF_CHECKED);
 	return TRUE;
 }
 /*
@@ -235,11 +280,18 @@ VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 	*/
 	if (hwndCtl == hTBSoundVolume)											//Adjusting the volume control (Настройка регулятора громкости)
 	{
-		INT p = SendMessage(hTBSoundVolume, TBM_GETPOS, NULL, NULL);
-		//SendMessage(hTBSoundVolume, TBM_SETPOS, TRUE, (LPARAM)p / 10);
-		//BASS_ChannelSetAttribute(hStream, BASS_ATTRIB_VOL, p / 100);
-		BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, p * 100);
-		BASS_SetVolume(p / 100.f);
+		INT p = SendMessage(hTBSoundVolume, TBM_GETPOS, NULL, NULL);		//Получение позиции
+		DOUBLE nPos = p * 0.01;		//новая позиция уровня громкости
+		/*
+			Собственный регулятор громкости
+		*/
+		SendMessage(hTBSoundVolume, TBM_SETPOS, TRUE, (LPARAM)p);
+		BASS_ChannelSetAttribute(hStream, BASS_ATTRIB_VOL, nPos);
+		/*
+			Привязка к windows регулятору громкости
+		*/
+		//BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, p * 100);
+		//BASS_SetVolume(p / 100.f);
 		
 	}
 	/*
@@ -271,7 +323,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 	static BOOL IsStop = FALSE;				//был ли нажат Stop
 	switch (id)
 	{
-		case IDC_BTNPLAY:									
+		case IDC_BTNPLAY:						//Play
 		{
 			if (hStream == NULL && playlist.songs.size() == 0)
 			{
@@ -324,6 +376,9 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			KillTimer(hwnd, idTimerBySpectr);
 			break;
 		}
+		/*
+			Checkbox плейлист
+		*/
 		case IDC_CHECKPLAYLIST:
 		{
 			static HWND hCheckPlayList = GetDlgItem(hwnd, IDC_CHECKPLAYLIST);
@@ -341,6 +396,9 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 
 			break;
 		}
+		/*
+			Checkbox эквалайзер
+		*/
 		case IDC_CHECKEQUALIZER:
 		{
 			static HWND hCheckEqualizer = GetDlgItem(hwnd, IDC_CHECKEQUALIZER);
@@ -359,27 +417,27 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			}
 			break;
 		}
-		case IDC_ADDSONG:									//AddSong
+		case IDC_ADDSONG:									//Добавление песни
 		{
 			openFile_LoadMusic(hwnd);
 			break;
 		}
-		case IDC_PREVSONG:									//PrevSong
+		case IDC_PREVSONG:									//Предыдущая песня
 		{
 			prev();
 			break;
 		}
-		case IDC_NEXTSONG:									//NextSong
+		case IDC_NEXTSONG:									//Следующая песня
 		{
 			next();
 			break;
 		}
-		case IDC_BTNCLOSE:									//CLose Programm
+		case IDC_BTNCLOSE:									//Закрытие программы
 		{
 			EndDialog(hwnd, 0);
 			break;
 		}
-		case IDC_REPEATSONG:								//Repeat song
+		case IDC_REPEATSONG:								//Повтор песни
 		{
 			if (IsRepeatSong == FALSE)
 			{
@@ -398,111 +456,151 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			break;
 		}
 		/*
-			Colors contour
+			Цвета контура
 		*/
 		case COLOR_CONTOUR_RED:
 		{
+			UncheckedAllMenuItemContour();
+			CheckMenuItem(hColorContour, COLOR_CONTOUR_RED, MF_BYCOMMAND | MF_CHECKED);
 			ColorContourSpectrum(255, 0, 0);
 			break;
 		}
 		case COLOR_CONTOUR_GREEN:
 		{
+			UncheckedAllMenuItemContour();
+			CheckMenuItem(hColorContour, COLOR_CONTOUR_GREEN, MF_BYCOMMAND | MF_CHECKED);
 			ColorContourSpectrum(0, 255, 0);
 			break;
 		}
 		case COLOR_CONTOUR_BLUE:
 		{
+			UncheckedAllMenuItemContour();
+			CheckMenuItem(hColorContour, COLOR_CONTOUR_BLUE, MF_BYCOMMAND | MF_CHECKED);
 			ColorContourSpectrum(0, 0, 255);
 			break;
 		}
 		case COLOR_CONTOUR_WHITE:
 		{
+			UncheckedAllMenuItemContour();
+			CheckMenuItem(hColorContour, COLOR_CONTOUR_WHITE, MF_BYCOMMAND | MF_CHECKED);
 			ColorContourSpectrum(255, 255, 255);
 			break;
 		}
 		case COLOR_CONTOUR_BLACK:
 		{
+			UncheckedAllMenuItemContour();
+			CheckMenuItem(hColorContour, COLOR_CONTOUR_BLACK, MF_BYCOMMAND | MF_CHECKED);
 			ColorContourSpectrum(0, 0, 0);
 			break;
 		}
 		/*
-			Colors fill
+			Цвета заливки
 		*/
 		case COLOR_FILL_RED:
 		{
+			UncheckedAllMenuItemFill();
+			CheckMenuItem(hColorFill, COLOR_FILL_RED, MF_BYCOMMAND | MF_CHECKED);
 			ColorFillSpectrum(255, 0, 0);
 			break;
 		}
 		case COLOR_FILL_GREEN:
 		{
+			UncheckedAllMenuItemFill();
+			CheckMenuItem(hColorFill, COLOR_FILL_GREEN, MF_BYCOMMAND | MF_CHECKED);
 			ColorFillSpectrum(0, 255, 0);
 			break;
 		}
 		case COLOR_FILL_BLUE:
 		{
+			UncheckedAllMenuItemFill();
+			CheckMenuItem(hColorFill, COLOR_FILL_BLUE, MF_BYCOMMAND | MF_CHECKED);
 			ColorFillSpectrum(0, 0, 255);
 			break;
 		}
 		case COLOR_FILL_WHITE:
 		{
+			UncheckedAllMenuItemFill();
+			CheckMenuItem(hColorFill, COLOR_FILL_WHITE, MF_BYCOMMAND | MF_CHECKED);
 			ColorFillSpectrum(255, 255, 255);
 			break;
 		}
 		case COLOR_FILL_BLACK:
 		{
+			UncheckedAllMenuItemFill();
+			CheckMenuItem(hColorFill, COLOR_FILL_BLACK, MF_BYCOMMAND | MF_CHECKED);
 			ColorFillSpectrum(0, 0, 0);
 			break;
 		}
 		/*
-			Transparency window
+			Прозрачность окна
 		*/
 		case TRANSPARENCY_100:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_100, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 100);
 			break;
 		}
 		case TRANSPARENCY_90:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_90, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 90);
 			break;
 		}
 		case TRANSPARENCY_80:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_80, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 80);
 			break;
 		}
 		case TRANSPARENCY_70:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_70, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 70);
 			break;
 		}
 		case TRANSPARENCY_60:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_60, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 60);
 			break;
 		}
 		case TRANSPARENCY_50:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_50, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 50);
 			break;
 		}
 		case TRANSPARENCY_40:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_40, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 40);
 			break;
 		}
 		case TRANSPARENCY_30:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_30, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 30);
 			break;
 		}
 		case TRANSPARENCY_20:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_20, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 20);
 			break;
 		}
 		case TRANSPARENCY_10:
 		{
+			UncheckedAllMenuItemTransperency();
+			CheckMenuItem(hTranperency, TRANSPARENCY_10, MF_BYCOMMAND | MF_CHECKED);
 			TransparencyWindow(hwnd, 10);
 			break;
 		}
@@ -511,15 +609,64 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 	}
 }
 /*
-	Processing WM_TIMER
+	Отображение название текущей играемой песни
+*/
+VOID Application::showNameSong(HSTREAM stream, HWND hWnd)
+{
+	TAG_ID3* id3 = (TAG_ID3*)BASS_ChannelGetTags(stream, BASS_TAG_ID3);		//получение данных о песне
+	std::wstringstream infoAboutTheSong;									//Буфер строки (Название песни + Исполнитель + время)
+	infoSong info;			
+	TCHAR path[MAX_PATH];
+	for (int i = 0;i < playlist.songs.size();i++)
+	{
+		if (stream == playlist.songs[i].hStream)
+		{
+			lstrcpy(path, playlist.songs[i].path);
+			break;
+		}
+	}
+	/*
+		Если при загрузке какие то данные загрузились с результатом NULL, 
+		то данные о песне вырезаются с пути
+	*/
+	if (id3 == NULL || strlen(id3->artist) == 0)
+	{
+		INT idx = lstrlen(path);
+		INT length = idx;
+		TCHAR name[MAX_PATH];
+		INT k = 0;
+		while (path[idx] != '\\')
+		{
+			idx--;
+		}
+		for (INT i = idx + 1; i < length;i++)
+		{
+			name[k] = path[i];
+			k++;
+		}
+		name[k - 4] = '\0';			//Delete format songs
+		infoAboutTheSong << name << "               ";
+	}
+	else
+	{
+		strcpy(info.title, id3->title);							//Name
+		strcpy(info.artist, id3->artist);						//Author
+		strcpy(info.album, id3->album);							//Album
+		strcpy(info.year, id3->year);							//Year
+		infoAboutTheSong << info.artist << " "
+			<< info.title << "               ";
+	}
+	SetWindowText(hWnd, infoAboutTheSong.str().c_str());
+}
+/*
+	WM_TIMER
 */
 VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 {
 	if (id == id_timer)
 	{
-		secPlaying++;
 		QWORD len = BASS_ChannelGetLength(hStream, BASS_POS_BYTE);
-		INT seconds = BASS_ChannelBytes2Seconds(hStream, len) + 1;
+		INT seconds = BASS_ChannelBytes2Seconds(hStream, len);
 		SendMessage(hTBPlayingSong, TBM_SETPOS, TRUE, (LPARAM)secPlaying);
 		INT pos = SendMessage(hTBPlayingSong, TBM_GETPOS, 0, 0);
 		if (secPlaying == seconds && IsRepeatSong == FALSE && playlist.songs.size() > 1)
@@ -542,7 +689,13 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 			stop(hStream);
 			KillTimer(hwnd, id_timer);
 		}
+		/*
+			Показ времени проигрывания
+		*/
 		showTimePlaying(hwnd, secPlaying);
+		if (secPlaying == 0)
+			showNameSong(hStream, hwnd);
+		secPlaying++;
 	}
 	else if (id == idTimerBySpectr)
 	{
@@ -550,7 +703,7 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 	}
 }
 /*
-	Processing WM_SYSCOMMAND
+	WM_SYSCOMMAND
 */
 VOID Application::Cls_OnSysCommand(HWND hwnd, UINT cmd, INT x, INT y)
 {
@@ -564,7 +717,7 @@ VOID Application::Cls_OnSysCommand(HWND hwnd, UINT cmd, INT x, INT y)
 	}
 }
 /*
-	Delete icon of tray 
+	Удаление иконки из трея
 */
 VOID Application::DeleteIconOfTray(HWND hWnd)
 {
@@ -577,7 +730,7 @@ VOID Application::DeleteIconOfTray(HWND hWnd)
 	ShowWindow(hWnd, SW_NORMAL);
 }
 /*
-	Add icon in tray
+	Добавление иконки в трей
 */
 VOID Application::AddIconInTray(HWND hWnd)
 {
@@ -594,68 +747,40 @@ VOID Application::AddIconInTray(HWND hWnd)
 	ShowWindow(hWnd, SW_HIDE);
 }
 /*
-	Processing WM_RBUTTONDOWN
+	WM_RBUTTONDOWN
 */
 VOID Application::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, UINT keyFlags)
 {
-	HMENU hContextMenu = CreatePopupMenu();
-	HMENU hColor = CreatePopupMenu();
-	HMENU hColorContour = CreatePopupMenu();
-	HMENU hColorFill = CreatePopupMenu();
-	HMENU hTranperency = CreatePopupMenu();
-	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hColor, TEXT("Color spectrum"));
-
-	AppendMenu(hColor, MF_STRING | MF_POPUP, (INT_PTR)hColorContour, TEXT("Color contour"));
-	AppendMenu(hColor, MF_STRING | MF_POPUP, (INT_PTR)hColorFill, TEXT("Color fill"));
-
-	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_RED, TEXT("Red"));
-	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_GREEN, TEXT("Green"));
-	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_BLUE, TEXT("Blue"));
-	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_WHITE, TEXT("White"));
-	AppendMenu(hColorContour, MF_STRING, COLOR_CONTOUR_BLACK, TEXT("Black"));
-	
-	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_RED, TEXT("Red"));
-	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_GREEN, TEXT("Green"));
-	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_BLUE, TEXT("Blue"));
-	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_WHITE, TEXT("White"));
-	AppendMenu(hColorFill, MF_STRING, COLOR_FILL_BLACK, TEXT("Black"));
-
-	/*
-		Transperency
-	*/
-	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hTranperency, TEXT("Transparency window"));
-
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_100, TEXT("100%"));
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_90, TEXT("90%"));
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_80, TEXT("80%"));
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_70, TEXT("70%"));
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_60, TEXT("60%"));
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_50, TEXT("50%"));
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_40, TEXT("40%"));
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_30, TEXT("30%"));
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_20, TEXT("20%"));
-	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_10, TEXT("10%"));
-
 	POINT p;
 	GetCursorPos(&p);
 	TrackPopupMenu(hContextMenu, TPM_LEFTALIGN, p.x, p.y, 0, hwnd, 0);
 }
 /*
-	Fnct loading bckg
+	Загрузка фона
 */
-HBRUSH OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
+HBRUSH Application::OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
 	static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAPBCKG)));
 	return brush;
 }
 /*
-	Dlg procedure by window
+	отображение статиков
+*/
+HBRUSH Application::OnColorStatic(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
+{
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, RGB(255, 255, 255));
+	return (HBRUSH)GetStockObject(BLACK_BRUSH);
+}
+/*
+	Диалоговая процедура
 */
 INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-		HANDLE_MSG(hWnd, WM_CTLCOLORDLG, OnCtlColor);
+		HANDLE_MSG(hWnd, WM_CTLCOLORSTATIC, _this->OnColorStatic);
+		HANDLE_MSG(hWnd, WM_CTLCOLORDLG, _this->OnCtlColor);
 		HANDLE_MSG(hWnd, WM_TIMER, _this->Cls_OnTimer);
 		HANDLE_MSG(hWnd, WM_INITDIALOG, _this->Cls_OnInitDialog);
 		HANDLE_MSG(hWnd, WM_HSCROLL, _this->Cls_OnHScroll);
@@ -663,31 +788,8 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		HANDLE_MSG(hWnd, WM_SYSCOMMAND, _this->Cls_OnSysCommand);
 		HANDLE_MSG(hWnd, WM_RBUTTONDOWN, _this->Cls_OnRButtonDown);
 		/*
-			Set color statics
+			Управление с трея
 		*/
-		case WM_CTLCOLORSTATIC:
-		{
-			HDC hDc = (HDC)wParam;
-			/*if (HWND(lParam) == _this->hTBSoundVolume)
-			{
-				SetBkMode(hDc, TRANSPARENT);
-				return (LRESULT)GetStockObject(BLACK_BRUSH);
-			}
-			else if (HWND(lParam) == _this->hSlider_Balance)
-			{
-				SetBkMode(hDc, TRANSPARENT);
-				return (LRESULT)GetStockObject(BLACK_BRUSH);
-			}
-			else if (HWND(lParam) == _this->hTBPlayingSong)
-			{
-				SetBkMode(hDc, TRANSPARENT);
-				return (LRESULT)GetStockObject(BLACK_BRUSH);
-			}
-			*/
-			SetBkMode(hDc, TRANSPARENT);
-			SetTextColor(hDc, RGB(255, 255, 255));
-			return (LRESULT)GetStockObject(BLACK_BRUSH);
-		}
 		case WM_USER + 200:
 		{
 			switch (lParam)
@@ -720,6 +822,9 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			}
 			break;
 		}
+		/*
+			Отрисовка спектра
+		*/
 		case WM_PAINT:
 		{
 			PAINTSTRUCT ps;
@@ -779,9 +884,6 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		}
 		case WM_CLOSE:
 		{
-			/*
-				Clear objects
-			*/
 			BASS_Free();
 			BASS_StreamFree(_this->hStream);
 			EndDialog(hWnd, NULL);
@@ -839,10 +941,11 @@ VOID Application::prev()
 			prev = allSongs - 1;
 		else
 			prev--;
+
 		stop(hStream);				//остановка потока
 		hStream = playlist.songs[prev].hStream;		//загрузка следующей песни в поток
-		secPlaying = 0;
-		setRangeTrackBarPlaySong(hStream);
+		secPlaying = 0;				//обнуление проигранных секунд
+		setRangeTrackBarPlaySong(hStream);		//установка диапазона полосы проигрывания
 		equalizer.SetFX(hStream);
 		play(hStream);				//воспроизвести поток
 		SetTimer(GetParent(hTBPlayingSong), id_timer, 1000, 0);
@@ -870,6 +973,7 @@ VOID Application::next()
 		//Если при нажатии на NextSong достигнут конец списка, перевести указатель на начало списка
 		if (next + 1 > allSongs)
 			next = 0;
+
 		stop(hStream);								//остановка потока
 		hStream = playlist.songs[next].hStream;		//загрузка следующей песни в поток
 		secPlaying = 0;								//сброс проигранных секунд
@@ -884,7 +988,42 @@ VOID Application::next()
 */
 VOID Application::setRangeTrackBarPlaySong(HSTREAM stream)
 {
-	QWORD len = BASS_ChannelGetLength(stream, BASS_POS_BYTE);
-	INT seconds = BASS_ChannelBytes2Seconds(stream, len);
-	SendMessage(hTBPlayingSong, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(0, seconds + 1));
+	QWORD len = BASS_ChannelGetLength(stream, BASS_POS_BYTE);			//получение длины песни в байтах
+	INT seconds = BASS_ChannelBytes2Seconds(stream, len);				//преобразование байт в секунды
+	SendMessage(hTBPlayingSong, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(0, seconds + 1));		//установка диапазон полосы прокрутки (диапазон = количеству секунд текущей песни)
+}
+/*
+	Снятие галочек с элементов меню
+*/
+	//Контур
+VOID Application::UncheckedAllMenuItemContour()
+{
+	CheckMenuItem(hColorContour, COLOR_CONTOUR_RED, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hColorContour, COLOR_CONTOUR_BLACK, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hColorContour, COLOR_CONTOUR_BLUE, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hColorContour, COLOR_CONTOUR_GREEN, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hColorContour, COLOR_CONTOUR_WHITE, MF_BYCOMMAND | MF_UNCHECKED);
+}
+	//Заливка
+VOID Application::UncheckedAllMenuItemFill()
+{
+	CheckMenuItem(hColorFill, COLOR_FILL_RED, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hColorFill, COLOR_FILL_BLACK, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hColorFill, COLOR_FILL_BLUE, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hColorFill, COLOR_FILL_GREEN, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hColorFill, COLOR_FILL_WHITE, MF_BYCOMMAND | MF_UNCHECKED);
+}
+	//Прозрачность
+VOID Application::UncheckedAllMenuItemTransperency()
+{
+	CheckMenuItem(hTranperency, TRANSPARENCY_10, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_20, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_30, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_40, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_50, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_60, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_70, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_80, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_90, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(hTranperency, TRANSPARENCY_100, MF_BYCOMMAND | MF_UNCHECKED);
 }

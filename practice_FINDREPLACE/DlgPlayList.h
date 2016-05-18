@@ -5,29 +5,30 @@
 class DlgPlayList
 {
 private:
-	HMENU hContextMenu;					//Handle menu
-	WNDPROC origProcContextMenu;		//Procedure by PlayList
-	HWND hDlg;							//Handle dlg
-	HWND hPlayList;						//Handle PlayList
-	std::vector<infoSong> songs;		//Vector songs. All songs in PlayList
-	INT red, green, blue;				//Color text in PlayList
+	HMENU hContextMenu;					//Дескриптор контекстного меню
+	WNDPROC origProcContextMenu;		//Процедура для плейлиста
+	HWND hDlg;							//Дескриптор основного окна приложения
+	HWND hPlayList;						//Дескриптор плейлиста
+	std::vector<infoSong> songs;		//Вектор всех песен в плейлисте
+	INT red, green, blue;				//Цвет текста в плейлисте
 public:
-	static DlgPlayList* _this;			//Pointer
+	static DlgPlayList* _this;			//Собственный указатель
 
-	DlgPlayList();			//Contructor
-	~DlgPlayList();			//Destructor
+	DlgPlayList();					//Конструктор
+	~DlgPlayList();					//Деструктор
 
 
-	static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);				//Procedure dlg
-	static INT_PTR CALLBACK ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);			//Procedure dlg by PlayList
-	VOID Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify);								//Processing WM_COMMAND
-	BOOL Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam);									//Processing WM_INITDIALOG
-	VOID Cls_OnContextMenu(HWND hwnd, HWND hwndContext, UINT xPos, UINT yPos);							//Processing WM_CONTEXTMENU
-	VOID Cls_OnDropFiles(HWND hwnd, HDROP hdrop);														//Processing WM_DROPFILES
-	VOID addSongToPlayList(HSTREAM stream, TCHAR*path);													//Add song by PlayList
-	VOID showPlayList(INT isShow);																		//Show PlayList
-	VOID changeColorTextInPlayList(HWND hWnd, INT r, INT g, INT b);										//Chahbe color text			
-	HBRUSH OnListColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type);
+	static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);				//Диалоговая процедура
+	static INT_PTR CALLBACK ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);			//диалоговая процедура для обрабокти сообщений в ListBox
+	VOID Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify);								//WM_COMMAND
+	BOOL Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam);									//WM_INITDIALOG
+	VOID Cls_OnContextMenu(HWND hwnd, HWND hwndContext, UINT xPos, UINT yPos);							//WM_CONTEXTMENU
+	VOID Cls_OnDropFiles(HWND hwnd, HDROP hdrop);														//WM_DROPFILES
+	VOID addSongToPlayList(HSTREAM stream, TCHAR*path);													//Добавление песни в плейлист
+	VOID showPlayList(INT isShow);																		//Отображение плейлиста
+	VOID changeColorTextInPlayList(HWND hWnd, INT r, INT g, INT b);										//Изменение цвета текста в плейлисте
+	HBRUSH OnListColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type);									//Цвет фона ListBox
+	VOID UncheckedAllItemContextMenu(HMENU hMenu);
 	VOID SavePlayList();
 	VOID LoadPlayList();
 	friend class Application;
