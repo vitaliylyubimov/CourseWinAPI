@@ -1,4 +1,4 @@
-#include "Application.h"
+п»ї#include "Application.h"
 
 Application* Application::_this = NULL;
 /*
@@ -11,11 +11,11 @@ Application::Application(VOID)
 	icc.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&icc);
 	_this = this;
-	CheckedInitBASS();					//проверка инициализации BASS
-	secPlaying = 0;						//время играющей песни
+	CheckedInitBASS();					//РїСЂРѕРІРµСЂРєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё BASS
+	secPlaying = 0;						//РІСЂРµРјСЏ РёРіСЂР°СЋС‰РµР№ РїРµСЃРЅРё
 	id_timer = 0;						//ID timer by PlayingSongs
 	idTimerBySpectr = 1;				//ID timer by Spectrum
-	IsRepeatSong = FALSE;				//повтор песни
+	IsRepeatSong = FALSE;				//РїРѕРІС‚РѕСЂ РїРµСЃРЅРё
 }
 /*
 	Destructor
@@ -25,23 +25,23 @@ Application::~Application()
 	ReleaseMutex(hMutex);
 }
 /*
-	Проверка версии BASS и инициализация устройства
+	РџСЂРѕРІРµСЂРєР° РІРµСЂСЃРёРё BASS Рё РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 INT Application::CheckedInitBASS()
 {
 	if (HIWORD(BASS_GetVersion()) != BASSVERSION)
 	{
-		MessageBox(NULL, TEXT("Ошибка версии BASS."), NULL, 0);
+		MessageBox(NULL, TEXT("РћС€РёР±РєР° РІРµСЂСЃРёРё BASS."), NULL, 0);
 		return 1;
 	}
 	if (!BASS_Init(-1, 44100, BASS_DEVICE_3D, 0, NULL))
 	{
-		MessageBox(NULL, TEXT("Не удалось инициализировать BASS."), NULL, 0);
+		MessageBox(NULL, TEXT("РќРµ СѓРґР°Р»РѕСЃСЊ РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ BASS."), NULL, 0);
 		return 1;
 	}
 }
 /*
-	Проверка открытия повторных копий приложения 
+	РџСЂРѕРІРµСЂРєР° РѕС‚РєСЂС‹С‚РёСЏ РїРѕРІС‚РѕСЂРЅС‹С… РєРѕРїРёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ 
 */
 VOID Application::CheckOpeningCopy(HWND hwnd)
 {
@@ -51,13 +51,13 @@ VOID Application::CheckOpeningCopy(HWND hwnd)
 	if (dwAnswer == WAIT_TIMEOUT)
 	{
 		std::wstringstream ss;
-		ss << NAMEPLEER << TEXT(" уже запущен");
+		ss << NAMEPLEER << TEXT(" СѓР¶Рµ Р·Р°РїСѓС‰РµРЅ");
 		MessageBox(hwnd, ss.str().c_str(), TEXT("Information"), MB_ICONEXCLAMATION);
 		EndDialog(hwnd, 0);
 	}
 }
 /*
-	Цвет заливки спектра
+	Р¦РІРµС‚ Р·Р°Р»РёРІРєРё СЃРїРµРєС‚СЂР°
 */
 VOID Application::ColorFillSpectrum(INT r, INT g, INT b)
 {
@@ -66,7 +66,7 @@ VOID Application::ColorFillSpectrum(INT r, INT g, INT b)
 	fill_blue = b;
 }
 /*
-	Цвет контура спектра
+	Р¦РІРµС‚ РєРѕРЅС‚СѓСЂР° СЃРїРµРєС‚СЂР°
 */
 VOID Application::ColorContourSpectrum(INT r, INT g, INT b)
 {
@@ -75,7 +75,7 @@ VOID Application::ColorContourSpectrum(INT r, INT g, INT b)
 	contour_blue = b;
 }
 /*
-	Прозрачность окна
+	РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РѕРєРЅР°
 */
 VOID Application::TransparencyWindow(HWND hWnd, INT value)
 {
@@ -85,7 +85,7 @@ VOID Application::TransparencyWindow(HWND hWnd, INT value)
 	SetLayeredWindowAttributes(hWnd, 0, (255 * value) / 100, LWA_ALPHA);
 }
 /*
-	Вывод времени проигрывания
+	Р’С‹РІРѕРґ РІСЂРµРјРµРЅРё РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 */
 VOID Application::showTimePlaying(HWND hWnd, INT secPlaying)
 {
@@ -112,14 +112,14 @@ VOID Application::showTimePlaying(HWND hWnd, INT secPlaying)
 	SetWindowText(GetDlgItem(hWnd, IDC_OUTTIME), ss.str().c_str());
 }
 /*
-	Запуск программы
+	Р—Р°РїСѓСЃРє РїСЂРѕРіСЂР°РјРјС‹
 */
 INT Application::runProgramm()
 {
 	return DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), NULL, DlgProc);
 }
 /*
-	Загрузка песни с компьютера
+	Р—Р°РіСЂСѓР·РєР° РїРµСЃРЅРё СЃ РєРѕРјРїСЊСЋС‚РµСЂР°
 */
 BOOL Application::openFile_LoadMusic(HWND hWnd)
 {
@@ -163,45 +163,45 @@ BOOL Application::openFile_LoadMusic(HWND hWnd)
 */
 BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
-	CheckOpeningCopy(hwnd);				//запуск проверки на открытие копий
+	CheckOpeningCopy(hwnd);				//Р·Р°РїСѓСЃРє РїСЂРѕРІРµСЂРєРё РЅР° РѕС‚РєСЂС‹С‚РёРµ РєРѕРїРёР№
 	/*
-		Установка заголовка окна
+		РЈСЃС‚Р°РЅРѕРІРєР° Р·Р°РіРѕР»РѕРІРєР° РѕРєРЅР°
 	*/
 	SetWindowText(hwnd, NAMEPLEER);
 	/*
-		Загрузка иконки приложения
+		Р—Р°РіСЂСѓР·РєР° РёРєРѕРЅРєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
 	*/	
 	hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON1));
 	SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon);		
 	/*
-		Слайдер громкости
+		РЎР»Р°Р№РґРµСЂ РіСЂРѕРјРєРѕСЃС‚Рё
 	*/
 	hTBSoundVolume = GetDlgItem(hwnd, IDC_TRACKBARSOUND); 
 	SendMessage(hTBSoundVolume, TBM_SETPOS, TRUE, (LPARAM)100);
 	/*
-		Слайдер полосы перемотки 
+		РЎР»Р°Р№РґРµСЂ РїРѕР»РѕСЃС‹ РїРµСЂРµРјРѕС‚РєРё 
 	*/
 	hTBPlayingSong = GetDlgItem(hwnd, IDC_SLIDER_TIMEPLAYING);
 	/*
-		Слайдер баланса
+		РЎР»Р°Р№РґРµСЂ Р±Р°Р»Р°РЅСЃР°
 	*/
 	hSlider_Balance = GetDlgItem(hwnd, IDC_SLIDERBALANCE);
 	SendMessage(hSlider_Balance, TBM_SETPOS, TRUE, (LPARAM)50);
 	SendMessage(hSlider_Balance, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(-5, 5));
 	/*
-		Создание окна плейлист
+		РЎРѕР·РґР°РЅРёРµ РѕРєРЅР° РїР»РµР№Р»РёСЃС‚
 	*/
 	playlist.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGPLAYLIST), hwnd, playlist.DlgProc);
 	/*
-		Создание окна эквалайзер
+		РЎРѕР·РґР°РЅРёРµ РѕРєРЅР° СЌРєРІР°Р»Р°Р№Р·РµСЂ
 	*/
 	equalizer.hDlg = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_DLGEQUALIZER), hwnd, equalizer.DlgProc);
 	/*
-		Установка времени на статике
+		РЈСЃС‚Р°РЅРѕРІРєР° РІСЂРµРјРµРЅРё РЅР° СЃС‚Р°С‚РёРєРµ
 	*/
 	Static_SetText(GetDlgItem(hwnd, IDC_OUTTIME), TEXT("00:00"));
 	/*
-		Загрузка изображений на элементы управления
+		Р—Р°РіСЂСѓР·РєР° РёР·РѕР±СЂР°Р¶РµРЅРёР№ РЅР° СЌР»РµРјРµРЅС‚С‹ СѓРїСЂР°РІР»РµРЅРёСЏ
 	*/
 	//No repeat
 	HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPNOREPEAT));
@@ -222,7 +222,7 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPNEXT));
 	SendMessage(GetDlgItem(hwnd, IDC_NEXTSONG), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
 	/*
-		Создание контекстного меню
+		РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚РЅРѕРіРѕ РјРµРЅСЋ
 	*/
 	AppendMenu(hContextMenu, MF_STRING | MF_POPUP, (INT_PTR)hColor, TEXT("Color spectrum"));
 
@@ -257,13 +257,13 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_20, TEXT("20%"));
 	AppendMenu(hTranperency, MF_STRING, TRANSPARENCY_10, TEXT("10%"));
 	/*
-		Инициализация цветов спектра
+		РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С†РІРµС‚РѕРІ СЃРїРµРєС‚СЂР°
 	*/
 	contour_red = contour_green = contour_blue = 0;
 	fill_red = 255;
 	fill_green = fill_blue = 0;
 	/*
-		Установка галочек в меню и цвет спектра
+		РЈСЃС‚Р°РЅРѕРІРєР° РіР°Р»РѕС‡РµРє РІ РјРµРЅСЋ Рё С†РІРµС‚ СЃРїРµРєС‚СЂР°
 	*/
 	CheckMenuItem(hColorContour, COLOR_CONTOUR_BLACK, MF_BYCOMMAND | MF_CHECKED);
 	CheckMenuItem(hColorFill, COLOR_FILL_RED, MF_BYCOMMAND | MF_CHECKED);
@@ -276,26 +276,26 @@ BOOL Application::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 {
 	/*
-		Громкость
+		Р“СЂРѕРјРєРѕСЃС‚СЊ
 	*/
-	if (hwndCtl == hTBSoundVolume)											//Adjusting the volume control (Настройка регулятора громкости)
+	if (hwndCtl == hTBSoundVolume)											//Adjusting the volume control (РќР°СЃС‚СЂРѕР№РєР° СЂРµРіСѓР»СЏС‚РѕСЂР° РіСЂРѕРјРєРѕСЃС‚Рё)
 	{
-		INT p = SendMessage(hTBSoundVolume, TBM_GETPOS, NULL, NULL);		//Получение позиции
-		DOUBLE nPos = p * 0.01;		//новая позиция уровня громкости
+		INT p = SendMessage(hTBSoundVolume, TBM_GETPOS, NULL, NULL);		//РџРѕР»СѓС‡РµРЅРёРµ РїРѕР·РёС†РёРё
+		DOUBLE nPos = p * 0.01;		//РЅРѕРІР°СЏ РїРѕР·РёС†РёСЏ СѓСЂРѕРІРЅСЏ РіСЂРѕРјРєРѕСЃС‚Рё
 		/*
-			Собственный регулятор громкости
+			РЎРѕР±СЃС‚РІРµРЅРЅС‹Р№ СЂРµРіСѓР»СЏС‚РѕСЂ РіСЂРѕРјРєРѕСЃС‚Рё
 		*/
 		SendMessage(hTBSoundVolume, TBM_SETPOS, TRUE, (LPARAM)p);
 		BASS_ChannelSetAttribute(hStream, BASS_ATTRIB_VOL, nPos);
 		/*
-			Привязка к windows регулятору громкости
+			РџСЂРёРІСЏР·РєР° Рє windows СЂРµРіСѓР»СЏС‚РѕСЂСѓ РіСЂРѕРјРєРѕСЃС‚Рё
 		*/
 		//BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, p * 100);
 		//BASS_SetVolume(p / 100.f);
 		
 	}
 	/*
-		Время проигрывания
+		Р’СЂРµРјСЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 	*/	
 	else if (hwndCtl == hTBPlayingSong)										
 	{
@@ -307,7 +307,7 @@ VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 		SendMessage(hTBPlayingSong, TBM_SETPOS, TRUE, (LPARAM)nPos);		//Translated position	
 	}
 	/*
-		Баланс
+		Р‘Р°Р»Р°РЅСЃ
 	*/
 	else if (hwndCtl == hSlider_Balance)
 	{
@@ -320,7 +320,7 @@ VOID Application::Cls_OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, INT pos)
 */
 VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify)
 {
-	static BOOL IsStop = FALSE;				//был ли нажат Stop
+	static BOOL IsStop = FALSE;				//Р±С‹Р» Р»Рё РЅР°Р¶Р°С‚ Stop
 	switch (id)
 	{
 		case IDC_BTNPLAY:						//Play
@@ -377,7 +377,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			break;
 		}
 		/*
-			Checkbox плейлист
+			Checkbox РїР»РµР№Р»РёСЃС‚
 		*/
 		case IDC_CHECKPLAYLIST:
 		{
@@ -397,7 +397,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			break;
 		}
 		/*
-			Checkbox эквалайзер
+			Checkbox СЌРєРІР°Р»Р°Р№Р·РµСЂ
 		*/
 		case IDC_CHECKEQUALIZER:
 		{
@@ -417,27 +417,27 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			}
 			break;
 		}
-		case IDC_ADDSONG:									//Добавление песни
+		case IDC_ADDSONG:									//Р”РѕР±Р°РІР»РµРЅРёРµ РїРµСЃРЅРё
 		{
 			openFile_LoadMusic(hwnd);
 			break;
 		}
-		case IDC_PREVSONG:									//Предыдущая песня
+		case IDC_PREVSONG:									//РџСЂРµРґС‹РґСѓС‰Р°СЏ РїРµСЃРЅСЏ
 		{
 			prev();
 			break;
 		}
-		case IDC_NEXTSONG:									//Следующая песня
+		case IDC_NEXTSONG:									//РЎР»РµРґСѓСЋС‰Р°СЏ РїРµСЃРЅСЏ
 		{
 			next();
 			break;
 		}
-		case IDC_BTNCLOSE:									//Закрытие программы
+		case IDC_BTNCLOSE:									//Р—Р°РєСЂС‹С‚РёРµ РїСЂРѕРіСЂР°РјРјС‹
 		{
 			EndDialog(hwnd, 0);
 			break;
 		}
-		case IDC_REPEATSONG:								//Повтор песни
+		case IDC_REPEATSONG:								//РџРѕРІС‚РѕСЂ РїРµСЃРЅРё
 		{
 			if (IsRepeatSong == FALSE)
 			{
@@ -456,7 +456,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			break;
 		}
 		/*
-			Цвета контура
+			Р¦РІРµС‚Р° РєРѕРЅС‚СѓСЂР°
 		*/
 		case COLOR_CONTOUR_RED:
 		{
@@ -494,7 +494,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			break;
 		}
 		/*
-			Цвета заливки
+			Р¦РІРµС‚Р° Р·Р°Р»РёРІРєРё
 		*/
 		case COLOR_FILL_RED:
 		{
@@ -532,7 +532,7 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			break;
 		}
 		/*
-			Прозрачность окна
+			РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РѕРєРЅР°
 		*/
 		case TRANSPARENCY_100:
 		{
@@ -609,12 +609,12 @@ VOID Application::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 	}
 }
 /*
-	Отображение название текущей играемой песни
+	РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РЅР°Р·РІР°РЅРёРµ С‚РµРєСѓС‰РµР№ РёРіСЂР°РµРјРѕР№ РїРµСЃРЅРё
 */
 VOID Application::showNameSong(HSTREAM stream, HWND hWnd)
 {
-	TAG_ID3* id3 = (TAG_ID3*)BASS_ChannelGetTags(stream, BASS_TAG_ID3);		//получение данных о песне
-	std::wstringstream infoAboutTheSong;									//Буфер строки (Название песни + Исполнитель + время)
+	TAG_ID3* id3 = (TAG_ID3*)BASS_ChannelGetTags(stream, BASS_TAG_ID3);		//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… Рѕ РїРµСЃРЅРµ
+	std::wstringstream infoAboutTheSong;									//Р‘СѓС„РµСЂ СЃС‚СЂРѕРєРё (РќР°Р·РІР°РЅРёРµ РїРµСЃРЅРё + РСЃРїРѕР»РЅРёС‚РµР»СЊ + РІСЂРµРјСЏ)
 	infoSong info;			
 	TCHAR path[MAX_PATH];
 	for (int i = 0;i < playlist.songs.size();i++)
@@ -626,8 +626,8 @@ VOID Application::showNameSong(HSTREAM stream, HWND hWnd)
 		}
 	}
 	/*
-		Если при загрузке какие то данные загрузились с результатом NULL, 
-		то данные о песне вырезаются с пути
+		Р•СЃР»Рё РїСЂРё Р·Р°РіСЂСѓР·РєРµ РєР°РєРёРµ С‚Рѕ РґР°РЅРЅС‹Рµ Р·Р°РіСЂСѓР·РёР»РёСЃСЊ СЃ СЂРµР·СѓР»СЊС‚Р°С‚РѕРј NULL, 
+		С‚Рѕ РґР°РЅРЅС‹Рµ Рѕ РїРµСЃРЅРµ РІС‹СЂРµР·Р°СЋС‚СЃСЏ СЃ РїСѓС‚Рё
 	*/
 	if (id3 == NULL || strlen(id3->artist) == 0)
 	{
@@ -690,7 +690,7 @@ VOID Application::Cls_OnTimer(HWND hwnd, UINT id)
 			KillTimer(hwnd, id_timer);
 		}
 		/*
-			Показ времени проигрывания
+			РџРѕРєР°Р· РІСЂРµРјРµРЅРё РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 		*/
 		showTimePlaying(hwnd, secPlaying);
 		if (secPlaying == 0)
@@ -717,7 +717,7 @@ VOID Application::Cls_OnSysCommand(HWND hwnd, UINT cmd, INT x, INT y)
 	}
 }
 /*
-	Удаление иконки из трея
+	РЈРґР°Р»РµРЅРёРµ РёРєРѕРЅРєРё РёР· С‚СЂРµСЏ
 */
 VOID Application::DeleteIconOfTray(HWND hWnd)
 {
@@ -730,7 +730,7 @@ VOID Application::DeleteIconOfTray(HWND hWnd)
 	ShowWindow(hWnd, SW_NORMAL);
 }
 /*
-	Добавление иконки в трей
+	Р”РѕР±Р°РІР»РµРЅРёРµ РёРєРѕРЅРєРё РІ С‚СЂРµР№
 */
 VOID Application::AddIconInTray(HWND hWnd)
 {
@@ -756,7 +756,7 @@ VOID Application::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, 
 	TrackPopupMenu(hContextMenu, TPM_LEFTALIGN, p.x, p.y, 0, hwnd, 0);
 }
 /*
-	Загрузка фона
+	Р—Р°РіСЂСѓР·РєР° С„РѕРЅР°
 */
 HBRUSH Application::OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
@@ -764,7 +764,7 @@ HBRUSH Application::OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 	return brush;
 }
 /*
-	отображение статиков
+	РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃС‚Р°С‚РёРєРѕРІ
 */
 HBRUSH Application::OnColorStatic(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
@@ -773,7 +773,7 @@ HBRUSH Application::OnColorStatic(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 	return (HBRUSH)GetStockObject(BLACK_BRUSH);
 }
 /*
-	Диалоговая процедура
+	Р”РёР°Р»РѕРіРѕРІР°СЏ РїСЂРѕС†РµРґСѓСЂР°
 */
 INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -788,7 +788,7 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		HANDLE_MSG(hWnd, WM_SYSCOMMAND, _this->Cls_OnSysCommand);
 		HANDLE_MSG(hWnd, WM_RBUTTONDOWN, _this->Cls_OnRButtonDown);
 		/*
-			Управление с трея
+			РЈРїСЂР°РІР»РµРЅРёРµ СЃ С‚СЂРµСЏ
 		*/
 		case WM_USER + 200:
 		{
@@ -823,7 +823,7 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			break;
 		}
 		/*
-			Отрисовка спектра
+			РћС‚СЂРёСЃРѕРІРєР° СЃРїРµРєС‚СЂР°
 		*/
 		case WM_PAINT:
 		{
@@ -861,7 +861,7 @@ INT_PTR CALLBACK Application::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			int y = height;
 			int offset = 35;
 			int columns = 77;			//count columns
-			int w = (rect.right - rect.left - 35) / columns ; // ширина столбика
+			int w = (rect.right - rect.left - 35) / columns ; // С€РёСЂРёРЅР° СЃС‚РѕР»Р±РёРєР°
 			FLOAT buffer_peaks[128] = { height };
 			BASS_ChannelGetData(_this->hStream, buffer_peaks, BASS_DATA_FFT256);
 
@@ -923,11 +923,11 @@ VOID Application::pause()
 */
 VOID Application::prev()
 {
-	INT allSongs = playlist.songs.size();		//всего песен
-	INT prev = 0;							//след играющая песня
+	INT allSongs = playlist.songs.size();		//РІСЃРµРіРѕ РїРµСЃРµРЅ
+	INT prev = 0;							//СЃР»РµРґ РёРіСЂР°СЋС‰Р°СЏ РїРµСЃРЅСЏ
 	if (allSongs > 0)
 	{
-		//Поиск текущей играемой песни
+		//РџРѕРёСЃРє С‚РµРєСѓС‰РµР№ РёРіСЂР°РµРјРѕР№ РїРµСЃРЅРё
 		for (INT i = 0; i < allSongs; i++)
 		{
 			if (hStream == playlist.songs[i].hStream)
@@ -936,19 +936,20 @@ VOID Application::prev()
 			}
 			prev++;
 		}
-		//Если при нажатии на PrevtSong достигнут начало списка, перевести указатель на конец списка
+		//Р•СЃР»Рё РїСЂРё РЅР°Р¶Р°С‚РёРё РЅР° PrevtSong РґРѕСЃС‚РёРіРЅСѓС‚ РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР°, РїРµСЂРµРІРµСЃС‚Рё СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕРЅРµС† СЃРїРёСЃРєР°
 		if (prev - 1 < 0)
 			prev = allSongs - 1;
 		else
 			prev--;
 
-		stop(hStream);				//остановка потока
-		hStream = playlist.songs[prev].hStream;		//загрузка следующей песни в поток
-		secPlaying = 0;				//обнуление проигранных секунд
-		setRangeTrackBarPlaySong(hStream);		//установка диапазона полосы проигрывания
+		stop(hStream);				//РѕСЃС‚Р°РЅРѕРІРєР° РїРѕС‚РѕРєР°
+		hStream = playlist.songs[prev].hStream;		//Р·Р°РіСЂСѓР·РєР° СЃР»РµРґСѓСЋС‰РµР№ РїРµСЃРЅРё РІ РїРѕС‚РѕРє
+		secPlaying = 0;				//РѕР±РЅСѓР»РµРЅРёРµ РїСЂРѕРёРіСЂР°РЅРЅС‹С… СЃРµРєСѓРЅРґ
+		setRangeTrackBarPlaySong(hStream);		//СѓСЃС‚Р°РЅРѕРІРєР° РґРёР°РїР°Р·РѕРЅР° РїРѕР»РѕСЃС‹ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 		equalizer.SetFX(hStream);
-		play(hStream);				//воспроизвести поток
+		play(hStream);				//РІРѕСЃРїСЂРѕРёР·РІРµСЃС‚Рё РїРѕС‚РѕРє
 		SetTimer(GetParent(hTBPlayingSong), id_timer, 1000, 0);
+		SendMessage(playlist.hPlayList, LB_SETCURSEL, prev, 0);	//РІС‹РґРµР»СЏРµС‚ С‚РµРєСѓС‰СѓСЋ РїРµСЃРЅСЏ РІ РїР»РµР№Р»РёСЃС‚Рµ
 	}
 }
 /*
@@ -956,11 +957,11 @@ VOID Application::prev()
 */
 VOID Application::next()
 {
-	INT allSongs = playlist.songs.size();		//всего песен
-	INT next = 0;						//след играющая песня
+	INT allSongs = playlist.songs.size();		//РІСЃРµРіРѕ РїРµСЃРµРЅ
+	INT next = 0;						//СЃР»РµРґ РёРіСЂР°СЋС‰Р°СЏ РїРµСЃРЅСЏ
 	if (allSongs > 0)
 	{
-		//Поиск текущей играемой песни
+		//РџРѕРёСЃРє С‚РµРєСѓС‰РµР№ РёРіСЂР°РµРјРѕР№ РїРµСЃРЅРё
 		for (INT i = 0; i < allSongs; i++)
 		{
 			if (hStream == playlist.songs[i].hStream)
@@ -970,32 +971,33 @@ VOID Application::next()
 			}
 			next++;
 		}
-		//Если при нажатии на NextSong достигнут конец списка, перевести указатель на начало списка
+		//Р•СЃР»Рё РїСЂРё РЅР°Р¶Р°С‚РёРё РЅР° NextSong РґРѕСЃС‚РёРіРЅСѓС‚ РєРѕРЅРµС† СЃРїРёСЃРєР°, РїРµСЂРµРІРµСЃС‚Рё СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР°
 		if (next + 1 > allSongs)
 			next = 0;
 
-		stop(hStream);								//остановка потока
-		hStream = playlist.songs[next].hStream;		//загрузка следующей песни в поток
-		secPlaying = 0;								//сброс проигранных секунд
-		setRangeTrackBarPlaySong(hStream);			//установка диапазона TrackBar под играющую песню 
+		stop(hStream);								//РѕСЃС‚Р°РЅРѕРІРєР° РїРѕС‚РѕРєР°
+		hStream = playlist.songs[next].hStream;		//Р·Р°РіСЂСѓР·РєР° СЃР»РµРґСѓСЋС‰РµР№ РїРµСЃРЅРё РІ РїРѕС‚РѕРє
+		secPlaying = 0;								//СЃР±СЂРѕСЃ РїСЂРѕРёРіСЂР°РЅРЅС‹С… СЃРµРєСѓРЅРґ
+		setRangeTrackBarPlaySong(hStream);			//СѓСЃС‚Р°РЅРѕРІРєР° РґРёР°РїР°Р·РѕРЅР° TrackBar РїРѕРґ РёРіСЂР°СЋС‰СѓСЋ РїРµСЃРЅСЋ 
 		equalizer.SetFX(hStream);					
-		play(hStream);								//воспроизвести поток
-		SetTimer(GetParent(hTBPlayingSong), id_timer, 1000, 0);	//Запуск таймера 
+		play(hStream);								//РІРѕСЃРїСЂРѕРёР·РІРµСЃС‚Рё РїРѕС‚РѕРє
+		SetTimer(GetParent(hTBPlayingSong), id_timer, 1000, 0);	//Р—Р°РїСѓСЃРє С‚Р°Р№РјРµСЂР° 
+		SendMessage(playlist.hPlayList, LB_SETCURSEL, next, 0);	//РІС‹РґРµР»СЏРµС‚ С‚РµРєСѓС‰СѓСЋ РїРµСЃРЅСЏ РІ РїР»РµР№Р»РёСЃС‚Рµ
 	}
 }
 /*
-	Установка диапазона полосы перемотки
+	РЈСЃС‚Р°РЅРѕРІРєР° РґРёР°РїР°Р·РѕРЅР° РїРѕР»РѕСЃС‹ РїРµСЂРµРјРѕС‚РєРё
 */
 VOID Application::setRangeTrackBarPlaySong(HSTREAM stream)
 {
-	QWORD len = BASS_ChannelGetLength(stream, BASS_POS_BYTE);			//получение длины песни в байтах
-	INT seconds = BASS_ChannelBytes2Seconds(stream, len);				//преобразование байт в секунды
-	SendMessage(hTBPlayingSong, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(0, seconds + 1));		//установка диапазон полосы прокрутки (диапазон = количеству секунд текущей песни)
+	QWORD len = BASS_ChannelGetLength(stream, BASS_POS_BYTE);			//РїРѕР»СѓС‡РµРЅРёРµ РґР»РёРЅС‹ РїРµСЃРЅРё РІ Р±Р°Р№С‚Р°С…
+	INT seconds = BASS_ChannelBytes2Seconds(stream, len);				//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Р±Р°Р№С‚ РІ СЃРµРєСѓРЅРґС‹
+	SendMessage(hTBPlayingSong, TBM_SETRANGE, 0, (LPARAM)MAKELPARAM(0, seconds + 1));		//СѓСЃС‚Р°РЅРѕРІРєР° РґРёР°РїР°Р·РѕРЅ РїРѕР»РѕСЃС‹ РїСЂРѕРєСЂСѓС‚РєРё (РґРёР°РїР°Р·РѕРЅ = РєРѕР»РёС‡РµСЃС‚РІСѓ СЃРµРєСѓРЅРґ С‚РµРєСѓС‰РµР№ РїРµСЃРЅРё)
 }
 /*
-	Снятие галочек с элементов меню
+	РЎРЅСЏС‚РёРµ РіР°Р»РѕС‡РµРє СЃ СЌР»РµРјРµРЅС‚РѕРІ РјРµРЅСЋ
 */
-	//Контур
+	//РљРѕРЅС‚СѓСЂ
 VOID Application::UncheckedAllMenuItemContour()
 {
 	CheckMenuItem(hColorContour, COLOR_CONTOUR_RED, MF_BYCOMMAND | MF_UNCHECKED);
@@ -1004,7 +1006,7 @@ VOID Application::UncheckedAllMenuItemContour()
 	CheckMenuItem(hColorContour, COLOR_CONTOUR_GREEN, MF_BYCOMMAND | MF_UNCHECKED);
 	CheckMenuItem(hColorContour, COLOR_CONTOUR_WHITE, MF_BYCOMMAND | MF_UNCHECKED);
 }
-	//Заливка
+	//Р—Р°Р»РёРІРєР°
 VOID Application::UncheckedAllMenuItemFill()
 {
 	CheckMenuItem(hColorFill, COLOR_FILL_RED, MF_BYCOMMAND | MF_UNCHECKED);
@@ -1013,7 +1015,7 @@ VOID Application::UncheckedAllMenuItemFill()
 	CheckMenuItem(hColorFill, COLOR_FILL_GREEN, MF_BYCOMMAND | MF_UNCHECKED);
 	CheckMenuItem(hColorFill, COLOR_FILL_WHITE, MF_BYCOMMAND | MF_UNCHECKED);
 }
-	//Прозрачность
+	//РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ
 VOID Application::UncheckedAllMenuItemTransperency()
 {
 	CheckMenuItem(hTranperency, TRANSPARENCY_10, MF_BYCOMMAND | MF_UNCHECKED);
