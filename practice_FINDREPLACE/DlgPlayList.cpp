@@ -23,9 +23,17 @@ DlgPlayList::~DlgPlayList(){}
 */
 HBRUSH DlgPlayList::OnListColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
-	HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
+	static HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	SetTextColor(hdc, RGB(red, green, blue));
-	SetBkColor(hdc, RGB(0,0,0));
+	SetBkMode(hdc, TRANSPARENT);
+	return brush;
+}
+/*
+	Загрузка фона
+*/
+HBRUSH DlgPlayList::OnBckgColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
+{
+	static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPABSTRACTION)));
 	return brush;
 }
 /*
@@ -36,6 +44,7 @@ INT_PTR CALLBACK DlgPlayList::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	switch (uMsg)
 	{
 		HANDLE_MSG(hWnd, WM_CTLCOLORLISTBOX, _this->OnListColor);
+		HANDLE_MSG(hWnd, WM_CTLCOLORDLG, _this->OnBckgColor);
 		HANDLE_MSG(hWnd, WM_INITDIALOG, _this->Cls_OnInitDialog);
 		HANDLE_MSG(hWnd, WM_COMMAND, _this->Cls_OnCommand);
 		case WM_LBUTTONDOWN:
@@ -94,16 +103,6 @@ VOID DlgPlayList::Cls_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify
 			SendMessage(GetParent(hwnd), WM_COMMAND, IDC_ADDSONG, 0);
 			break;
 		}
-		case IDC_SAVEPLAYLIST:
-		{
-			//SavePlayList();
-			break;
-		}
-		case IDC_LOADPLAYLIST:
-		{
-			//LoadPlayList();
-			break;
-		}
 		default:
 			break;
 	}
@@ -123,6 +122,8 @@ BOOL DlgPlayList::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		Создание контекстного меню
 	*/
 	hContextMenu = CreatePopupMenu();
+	AppendMenu(hContextMenu, MF_STRING, IDC_ADDSONG, TEXT("&Add song..."));
+	AppendMenu(hContextMenu, MF_SEPARATOR, 0, 0);
 	AppendMenu(hContextMenu, MF_STRING, IDC_DELETE, TEXT("&Delete"));
 	AppendMenu(hContextMenu, MF_STRING, IDC_CLEANPLAYLIST, TEXT("D&elete all"));
 	AppendMenu(hContextMenu, MF_SEPARATOR, 0, 0);
@@ -134,11 +135,8 @@ BOOL DlgPlayList::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	AppendMenu(hColor, MF_STRING, IDC_COLORWHITE, TEXT("&White"));
 	AppendMenu(hColor, MF_STRING, IDC_COLORYELLOW, TEXT("&Yellow"));
 	AppendMenu(hColor, MF_STRING, IDC_COLORTURQUOISE, TEXT("&Turquoise"));
-	/*
-		Загрузка изображения на кнопку
-	*/
-	HBITMAP bmp = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPSAVE));
-	SendMessage(GetDlgItem(hwnd, IDC_SAVEPLAYLIST), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+	//установка галочку на изначальный цвет
+	CheckMenuItem(hColor, IDC_COLORTEXTGREEN, MF_BYCOMMAND | MF_CHECKED);
 	return TRUE;
 }
 /*
@@ -223,6 +221,12 @@ VOID DlgPlayList::Cls_OnContextMenu(HWND hwnd, HWND hwndContext, UINT xPos, UINT
 	*/
 	if (idx >= 0)
 		TrackPopupMenu(_this->hContextMenu, TPM_BOTTOMALIGN, pos.x, pos.y, 0, hwndContext, 0);
+	else if (songs.size() == 0)
+	{
+		HMENU hMenu = CreatePopupMenu();
+		AppendMenu(hMenu, MF_STRING, IDC_ADDSONG, TEXT("Add song..."));
+		TrackPopupMenu(hMenu, TPM_BOTTOMALIGN, pos.x, pos.y, 0, hwndContext, 0);
+	}
 }
 /*
 	Собственная функция сравнения строк
@@ -305,6 +309,11 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		{
 			switch (LOWORD(wParam))
 			{
+				case IDC_ADDSONG:
+				{
+					SendMessage(GetParent(hWnd), WM_COMMAND, IDC_ADDSONG, 0);
+					break;
+				}
 				case IDC_DELETE:
 				{
 					int idxSel = ListBox_GetCurSel(_this->hPlayList);
@@ -374,51 +383,4 @@ INT_PTR CALLBACK DlgPlayList::ProcPlayList(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		}
 	}
 	return CallWindowProc(_this->origProcContextMenu, hWnd, uMsg, wParam, lParam);
-}
-/*
-	Save the playlist to file 
-*/
-VOID DlgPlayList::SavePlayList()
-{
-	if (songs.size() != 0)
-	{
-		std::ofstream fout("Playlist.txt", std::ios::binary);
-		//запись количества песен в плейлисте
-		fout << songs.size();
-		for (int i = 0;i < songs.size();i++)
-			fout.write((char*)&songs[i], sizeof(infoSong));
-
-		fout.close();
-	}
-}
-/*
-	Load the playlist to file
-*/ 
-VOID DlgPlayList::LoadPlayList()
-{
-	/*
-		Clear playlist
-	*/
-	ListBox_ResetContent(hPlayList);
-	std::ifstream fin("Playlist.txt", std::ios::binary);
-	int count;
-	fin >> count;
-	infoSong iS;
-	if (fin.is_open())
-	{
-		for (int i = 0;i < count;i++) 
-		{
-			fin.read((char*)&iS, sizeof(infoSong));
-			HSTREAM stream = BASS_StreamCreateFile(0, iS.path, 0, 0, 0);
-			if (stream == 0)
-			{
-				addSongToPlayList(iS.hStream, iS.path);
-			}
-			else {
-				iS.hStream = stream;
-				addSongToPlayList(iS.hStream, iS.path);
-			}
-		}
-		fin.close();
-	}
 }

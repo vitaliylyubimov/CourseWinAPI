@@ -28,6 +28,7 @@ public:
 	VOID showPlayList(INT isShow);																		//Отображение плейлиста
 	VOID changeColorTextInPlayList(HWND hWnd, INT r, INT g, INT b);										//Изменение цвета текста в плейлисте
 	HBRUSH OnListColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type);									//Цвет фона ListBox
+	HBRUSH OnBckgColor(HWND hwnd, HDC hdc, HWND hwndChild, INT type);									//Фон
 	VOID UncheckedAllItemContextMenu(HMENU hMenu);
 	VOID SavePlayList();
 	VOID LoadPlayList();

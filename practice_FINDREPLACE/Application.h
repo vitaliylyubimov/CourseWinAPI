@@ -59,7 +59,7 @@ public:
 	VOID ColorContourSpectrum(INT r, INT g, INT b);					//Цвет контура заливки
 	VOID TransparencyWindow(HWND hWnd, INT value);					//Прозрачность окна
 	VOID showTimePlaying(HWND hWnd, INT secPlaying);				//Время играющей песни
-	VOID showNameSong(HSTREAM stream, HWND hWnd);
+	VOID showNameSong(HSTREAM stream, HWND hWnd);					//отображение названия текущей песни
 	VOID UncheckedAllMenuItemContour();								//Снятие всех галочек с элементов меню Контура
 	VOID UncheckedAllMenuItemFill();								//Снятие всех галочек с элементов меню Заливки
 	VOID UncheckedAllMenuItemTransperency();						//Снятие всех галочек с элементов меню Прозрачности

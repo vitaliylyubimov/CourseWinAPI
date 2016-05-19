@@ -84,16 +84,13 @@
     <Image Include="BMP\button_stop.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="BMP\bckg2.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="BMP\192179__square-section-highlighting_p.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="BMP\border palylist.bmp">
+    <Image Include="BMP\абстракция.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="BMP\Save.bmp">
+    <Image Include="BMP\Playlist_bckg.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

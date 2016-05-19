@@ -155,8 +155,8 @@ BOOL DlgEqualizer::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 */
 HBRUSH OnColorDlg(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
-	//static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPEQUAlIZER)));
-	static HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
+	static HBRUSH brush = CreatePatternBrush(LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_BITMAPABSTRACTION)));
+	//static HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	return brush;
 }
 /*
@@ -164,9 +164,27 @@ HBRUSH OnColorDlg(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 */
 HBRUSH OnColorStatic(HWND hwnd, HDC hdc, HWND hwndChild, INT type)
 {
-	SetBkMode(hdc, TRANSPARENT);
-	SetTextColor(hdc, RGB(255, 255, 255));
-	return (HBRUSH)GetStockObject(BLACK_BRUSH);
+	if (hwndChild != GetDlgItem(hwnd, IDC_STATIC_10kHz) &&
+		hwndChild != GetDlgItem(hwnd, IDC_STATIC_12kHz) &&
+		hwndChild != GetDlgItem(hwnd, IDC_STATIC_14kHz) &&
+		hwndChild != GetDlgItem(hwnd, IDC_STATIC_170Hz) &&
+		hwndChild != GetDlgItem(hwnd, IDC_STATIC_1kHz) &&
+		hwndChild != GetDlgItem(hwnd, IDC_STATIC_310Hz) &&
+		hwndChild != GetDlgItem(hwnd, IDC_STATIC_3kHz) &&
+		hwndChild != GetDlgItem(hwnd, IDC_STATIC_600Hz) &&
+		hwndChild != GetDlgItem(hwnd, IDC_STATIC_6kHz) &&
+		hwndChild != GetDlgItem(hwnd, IDC_STATIC_80Hz)
+		)
+	{
+		SetBkMode(hdc, TRANSPARENT);
+		return (HBRUSH)GetStockObject(BLACK_BRUSH);
+	}
+	else
+	{
+		SetBkMode(hdc, TRANSPARENT);
+		SetTextColor(hdc, RGB(255, 255, 255));
+		return (HBRUSH)GetStockObject(NULL_BRUSH);
+	}
 }
 /*
 	Диалоговая процедура

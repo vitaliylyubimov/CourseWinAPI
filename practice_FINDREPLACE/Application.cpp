@@ -984,7 +984,7 @@ VOID Application::next()
 	}
 }
 /*
-	Set range of the TrackBar (Time playing)
+	Установка диапазона полосы перемотки
 */
 VOID Application::setRangeTrackBarPlaySong(HSTREAM stream)
 {
